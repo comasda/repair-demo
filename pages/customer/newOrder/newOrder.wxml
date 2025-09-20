@@ -1,0 +1,23 @@
+<view class="container">
+  <view class="title">新建工单</view>
+
+  <input class="input" placeholder="请输入工单标题" bindinput="onTitleInput" />
+
+  <textarea class="textarea" placeholder="请输入问题描述" bindinput="onDescInput"></textarea>
+
+  <view class="section">
+    <text class="label">上传图片（可选）</text>
+    <button bindtap="chooseImage">选择图片</button>
+    <view class="images">
+      <block wx:for="{{images}}" wx:key="*this">
+        <image src="{{item}}" class="preview" mode="aspectFill"></image>
+      </block>
+    </view>
+  </view>
+
+  <input class="input" placeholder="请输入联系方式" bindinput="onPhoneInput" />
+
+  <input class="input" placeholder="请输入地址" bindinput="onAddressInput" />
+
+  <button class="btn-primary" bindtap="submitOrder">提交工单</button>
+</view>

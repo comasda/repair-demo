@@ -1,0 +1,60 @@
+.container {
+  padding: 30rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+}
+
+.input {
+  width: 100%;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 10rpx;
+  background: #fff;
+}
+
+.textarea {
+  width: 100%;
+  height: 200rpx;
+  padding: 20rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 10rpx;
+  margin-bottom: 20rpx;
+}
+
+.section {
+  margin-bottom: 20rpx;
+}
+
+.label {
+  display: block;
+  font-size: 28rpx;
+  margin-bottom: 10rpx;
+}
+
+.images {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.preview {
+  width: 160rpx;
+  height: 160rpx;
+  margin-right: 10rpx;
+  margin-bottom: 10rpx;
+  border-radius: 10rpx;
+}
+
+.btn-primary {
+  width: 100%;
+  background: linear-gradient(90deg, #6366f1, #4f46e5);
+  color: white;
+  font-size: 32rpx;
+  padding: 26rpx;
+  border-radius: 50rpx;
+  text-align: center;
+}

@@ -28,7 +28,7 @@
     </view>
     <view class="grid-item" bindtap="goRecords">
       <view class="icon-box bg-purple"><image src="/assets/icons/records.png" class="icon"/></view>
-      <text class="label">维修记录</text>
+      <text class="label">我的工单</text>
     </view>
     <view class="grid-item" bindtap="goEvaluate">
       <view class="icon-box bg-pink"><image src="/assets/icons/evaluate.png" class="icon"/></view>

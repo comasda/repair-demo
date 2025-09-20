@@ -25,12 +25,14 @@ Page({
   // 功能入口跳转（先用提示代替）
   goNewOrder() {
     wx.showToast({ title: '跳转新建工单', icon: 'none' })
+    wx.navigateTo({ url: '/pages/customer/newOrder/newOrder' })
   },
   goRecharge() {
     wx.showToast({ title: '跳转账户充值', icon: 'none' })
   },
   goRecords() {
     wx.showToast({ title: '跳转维修记录', icon: 'none' })
+    wx.navigateTo({ url: '/pages/customer/orders/orders' })
   },
   goEvaluate() {
     wx.showToast({ title: '跳转工单评价', icon: 'none' })

@@ -1,0 +1,34 @@
+<view class="container">
+  <view class="title">{{order.title}}</view>
+
+  <view class="section">
+    <text class="label">描述：</text>
+    <text>{{order.desc}}</text>
+  </view>
+
+  <view class="section">
+    <text class="label">联系方式：</text>
+    <text>{{order.phone}}</text>
+  </view>
+
+  <view class="section">
+    <text class="label">地址：</text>
+    <text>{{order.address}}</text>
+  </view>
+
+  <view class="section">
+    <text class="label">状态：</text>
+    <text>{{order.status}}</text>
+  </view>
+
+  <view class="section">
+    <text class="label">创建时间：</text>
+    <text>{{order.createdAt}}</text>
+  </view>
+
+  <view class="images">
+    <block wx:for="{{order.images}}" wx:key="*this">
+      <image src="{{item}}" class="preview" mode="aspectFill"></image>
+    </block>
+  </view>
+</view>

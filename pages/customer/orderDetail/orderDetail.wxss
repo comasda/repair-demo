@@ -1,0 +1,32 @@
+.container {
+  padding: 30rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+}
+
+.section {
+  margin-bottom: 20rpx;
+  font-size: 28rpx;
+}
+
+.label {
+  font-weight: bold;
+  margin-right: 10rpx;
+}
+
+.images {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.preview {
+  width: 200rpx;
+  height: 200rpx;
+  margin-right: 10rpx;
+  margin-bottom: 10rpx;
+  border-radius: 10rpx;
+}
