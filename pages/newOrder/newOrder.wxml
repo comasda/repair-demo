@@ -1,0 +1,22 @@
+<view class="container">
+  <view class="card">
+    <view class="title">新建工单</view>
+
+    <view style="margin:16rpx 0;">设备类型</view>
+    <input placeholder="例如：制冷冰箱" value="{{device}}" bindinput="onDeviceInput" class="card" />
+
+    <view style="margin:16rpx 0;">故障描述</view>
+    <textarea placeholder="请详细描述故障现象" value="{{issue}}" bindinput="onIssueInput" class="card" />
+
+    <view style="margin:16rpx 0;">上传故障图片（可选）</view>
+    <button class="btn" bindtap="chooseImage">选择图片</button>
+    <image wx:if="{{image}}" src="{{image}}" mode="widthFix" style="width:100%;border-radius:12rpx;margin-top:12rpx;" />
+
+    <view style="margin:16rpx 0;">报修位置（经纬度，可选）</view>
+    <button class="btn" bindtap="getLocation">{{location ? '重新获取定位' : '获取定位'}}</button>
+    <view style="margin-top:12rpx;color:#6b7280;">{{location || '未获取'}}</view>
+
+    <view class="hr"></view>
+    <button class="btn-primary" bindtap="submitOrder">提交报修</button>
+  </view>
+</view>

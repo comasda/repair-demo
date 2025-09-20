@@ -1,0 +1,17 @@
+<view class="container">
+  <view class="title">统计面板</view>
+  <view class="card" style="display:grid;grid-template-columns:1fr;gap:16rpx;">
+    <view>
+      <view style="font-size:48rpx;font-weight:700;">{{total}}</view>
+      <view style="color:#6b7280;">总工单数</view>
+    </view>
+    <view>
+      <view style="font-size:48rpx;font-weight:700;">{{inProgress}}</view>
+      <view style="color:#6b7280;">进行中工单</view>
+    </view>
+    <view>
+      <view style="font-size:48rpx;font-weight:700;">{{completed}}</view>
+      <view style="color:#6b7280;">已完成工单</view>
+    </view>
+  </view>
+</view>

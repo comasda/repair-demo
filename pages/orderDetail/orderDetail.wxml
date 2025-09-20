@@ -1,0 +1,72 @@
+<view class="container" wx:if="{{order.id}}">
+  <view class="card">
+    <view class="title">工单：{{order.id}}</view>
+    <view style="display:flex;gap:16rpx;align-items:center;">
+      <view class="badge badge-{{order.status}}">{{statusMap[order.status]}}</view>
+      <view style="color:#6b7280;">{{roleName}}</view>
+    </view>
+
+    <view class="hr"></view>
+
+    <view>客户：{{order.customer}}</view>
+    <view style="margin-top:8rpx;">设备：{{order.device}}</view>
+    <view style="margin-top:8rpx;">故障描述：{{order.issue}}</view>
+    <view style="margin-top:8rpx;">报修时间：{{order.time}}</view>
+    <view style="margin-top:8rpx;">报修位置：{{order.location || '无定位信息'}}</view>
+    <view style="margin-top:8rpx;">
+      图片：
+      <block wx:if="{{order.imageUrl}}">
+        <image src="{{order.imageUrl}}" style="width:100%;height:auto;border-radius:12rpx;" mode="widthFix"/>
+      </block>
+      <block wx:else>无图片</block>
+    </view>
+
+    <block wx:if="{{order.technicianName}}">
+      <view style="margin-top:8rpx;">指派师傅：{{order.technicianName}}</view>
+    </block>
+
+    <view class="hr"></view>
+
+    <view style="font-weight:700;margin-bottom:12rpx;">工单进度</view>
+    <block wx:for="{{order.history}}" wx:key="time">
+      <view style="margin-bottom:16rpx;">
+        <view style="color:#6b7280;font-size:24rpx;">{{item.time}}</view>
+        <view>{{item.note}}</view>
+      </view>
+    </block>
+
+    <view class="hr"></view>
+
+    <!-- 按钮区：按角色+状态渲染 -->
+    <view style="display:flex;flex-wrap:wrap;gap:16rpx;">
+      <!-- 管理员：派单 + 导出 -->
+      <block wx:if="{{role==='admin'}}">
+        <button class="btn-primary" bindtap="openAssign">派发工单</button>
+        <button class="btn" bindtap="exportCustomerOrders">导出该客户所有工单</button>
+      </block>
+
+      <!-- 技师：assigned->接单; accepted->签到; on-site->完成; 任意->拒单 -->
+      <block wx:if="{{role==='technician'}}">
+        <button wx:if="{{order.status==='assigned'}}" class="btn-primary" bindtap="accept">接单</button>
+        <button wx:if="{{order.status==='accepted'}}" class="btn" bindtap="checkIn">上门签到</button>
+        <button wx:if="{{order.status==='on-site'}}" class="btn" bindtap="complete">完成维修</button>
+        <button wx:if="{{order.status==='assigned' || order.status==='accepted'}}" class="btn" bindtap="reject">拒单</button>
+      </block>
+    </view>
+  </view>
+
+  <!-- 派发弹层（管理员） -->
+  <view wx:if="{{assignVisible}}" style="position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:99;">
+    <view class="card" style="width:88%;">
+      <view class="title">派发工单</view>
+      <picker mode="selector" range="{{techNames}}" bindchange="onPickTech">
+        <view class="card">选择维修师傅：{{pickedTechName || '未选择'}}</view>
+      </picker>
+      <view style="height:16rpx;"></view>
+      <view style="display:flex;gap:16rpx;justify-content:flex-end;">
+        <button class="btn" bindtap="closeAssign">取消</button>
+        <button class="btn-primary" bindtap="confirmAssign">确认派发</button>
+      </view>
+    </view>
+  </view>
+</view>
