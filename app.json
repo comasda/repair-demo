@@ -9,10 +9,6 @@
     "pages/customer/orderDetail/orderDetail",
     "pages/technician/home/home",
     "pages/admin/home/home",
-    "pages/index/index",
-    "pages/orders/orders",
-    "pages/orderDetail/orderDetail",
-    "pages/newOrder/newOrder",
     "pages/dashboard/dashboard"
   ],
 
