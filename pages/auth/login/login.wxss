@@ -1,1 +1,68 @@
-/* 使用全局样式 */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #f9fafb;
+  padding: 60rpx;
+  box-sizing: border-box;
+}
+
+/* Logo */
+.logo-box {
+  text-align: center;
+  margin-bottom: 100rpx;
+}
+.logo {
+  width: 160rpx;
+  height: 160rpx;
+  margin-bottom: 20rpx;
+}
+.title {
+  font-size: 42rpx;
+  font-weight: bold;
+  color: #111827;
+}
+
+/* 按钮 */
+.btn-group {
+  width: 100%;
+  max-width: 600rpx;
+}
+button {
+  width: 100%;
+  margin: 25rpx 0;
+  padding: 26rpx;
+  border-radius: 50rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  text-align: center;
+  border: none;
+}
+
+/* 主按钮 */
+.btn-primary {
+  background: linear-gradient(90deg, #6366f1, #4f46e5);
+  color: white;
+  box-shadow: 0 6rpx 12rpx rgba(79,70,229,0.3);
+}
+
+/* 微信按钮 */
+.btn-wechat {
+  background: #1AAD19;
+  color: white;
+  box-shadow: 0 6rpx 12rpx rgba(26,173,25,0.3);
+}
+
+/* 底部提示 */
+.footer {
+  margin-top: 80rpx;
+  font-size: 28rpx;
+  color: #6b7280;
+}
+.link {
+  color: #2563eb;
+  margin-left: 10rpx;
+  text-decoration: underline;
+}

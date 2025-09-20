@@ -1,0 +1,16 @@
+<view class="container">
+
+  <view class="title">手机号登录</view>
+
+  <view class="form-box">
+    <input type="text" placeholder="请输入手机号" maxlength="11" bindinput="onPhoneInput" class="input"/>
+    <input type="password" placeholder="请输入密码" bindinput="onPwdInput" class="input"/>
+  </view>
+
+  <button class="btn-primary" bindtap="loginWithPhone">立即登录</button>
+
+  <view class="footer">
+    <text bindtap="backToLogin">← 返回</text>
+    <text class="link">忘记密码？</text>
+  </view>
+</view>
