@@ -5,7 +5,7 @@
     "pages/auth/register/register",
     "pages/customer/home/home",
     "pages/customer/newOrder/newOrder",
-    "pages/customer/orders/orders",
+    "pages/customer/myOrders/myOrders",
     "pages/technician/home/home",
     "pages/admin/home/home",
     "pages/dashboard/dashboard",

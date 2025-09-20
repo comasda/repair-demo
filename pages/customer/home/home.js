@@ -32,7 +32,7 @@ Page({
   },
   goRecords() {
     wx.showToast({ title: '跳转维修记录', icon: 'none' })
-    wx.navigateTo({ url: '/pages/customer/orders/orders' })
+    wx.navigateTo({ url: '/pages/customer/myOrders/myOrders' })
   },
   goEvaluate() {
     wx.showToast({ title: '跳转工单评价', icon: 'none' })
