@@ -1,20 +1,27 @@
 <view class="container">
 
-  <!-- 顶部 Logo + 标题 -->
-  <view class="logo-box">
-    <image src="/assets/logo.png" class="logo"/>
-    <text class="title">维修管理系统</text>
+  <view class="title">登录</view>
+
+  <view wx:if="{{mode==='password'}}" class="form-box">
+    <input type="text" placeholder="请输入手机号" maxlength="11" bindinput="onPhoneInput" class="input"/>
+    <input type="password" placeholder="请输入密码" bindinput="onPwdInput" class="input"/>
+    <button class="btn-primary" bindtap="loginWithPassword">密码登录</button>
   </view>
 
-  <!-- 登录方式 -->
-  <view class="btn-group">
-    <button class="btn-primary" bindtap="choosePhoneLogin">📱 手机号登录</button>
-    <button class="btn-wechat" open-type="getUserProfile" bindtap="loginWithWechat">💚 微信登录</button>
+  <view wx:if="{{mode==='code'}}" class="form-box">
+    <input type="text" placeholder="请输入手机号" maxlength="11" bindinput="onPhoneInput" class="input"/>
+    <verify-code 
+      phone="{{phone}}" 
+      bind:codeinput="onCodeInput"
+      bind:codesent="onCodeSent"
+    />
+    <button class="btn-primary" bindtap="loginWithCode">验证码登录</button>
   </view>
 
-  <!-- 底部注册 -->
   <view class="footer">
-    <text>没有账号？</text>
+    <text class="link" bindtap="switchMode">
+      {{mode==='password' ? '用验证码登录' : '用密码登录'}}
+    </text>
     <text class="link" bindtap="goRegister">去注册</text>
   </view>
 </view>

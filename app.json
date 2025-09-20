@@ -12,6 +12,10 @@
     "pages/newOrder/newOrder",
     "pages/dashboard/dashboard"
   ],
+
+  "usingComponents": {
+    "verify-code": "/components/verify-code/verify-code"
+  },
   "window": {
     "navigationBarBackgroundColor": "#6366f1",
     "navigationBarTextStyle": "white",

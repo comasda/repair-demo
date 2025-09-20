@@ -1,0 +1,17 @@
+<view class="code-row">
+  <input 
+    type="text" 
+    placeholder="请输入验证码" 
+    maxlength="6" 
+    bindinput="onCodeInput" 
+    value="{{code}}" 
+    class="input-code"
+  />
+  <button 
+    class="btn-send" 
+    bindtap="sendCode" 
+    disabled="{{timer > 0}}"
+  >
+    {{timer > 0 ? timer + 's 重发' : '发送验证码'}}
+  </button>
+</view>
