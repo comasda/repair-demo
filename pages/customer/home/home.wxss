@@ -1,15 +1,73 @@
 .container {
-  padding: 40rpx;
+  background-color: #f3f4f6;
+  min-height: 100vh;
+  padding: 30rpx;
+  box-sizing: border-box;
 }
-.header {
-  font-size: 36rpx;
-  font-weight: bold;
+
+/* 顶部统计卡片 */
+.stats-card {
+  display: flex;
+  justify-content: space-between;
+  background: linear-gradient(90deg, #3b82f6, #6366f1);
+  border-radius: 20rpx;
+  padding: 30rpx 0;
   margin-bottom: 40rpx;
-}
-button {
-  margin: 20rpx 0;
-  padding: 20rpx;
-  border-radius: 12rpx;
-  background: #6366f1;
   color: white;
+  box-shadow: 0 8rpx 16rpx rgba(0,0,0,0.15);
 }
+.stat-item {
+  flex: 1;
+  text-align: center;
+}
+.stat-num {
+  font-size: 40rpx;
+  font-weight: bold;
+  display: block;
+}
+.stat-label {
+  font-size: 26rpx;
+  opacity: 0.9;
+}
+
+/* 功能入口卡片 */
+.grid-card {
+  display: flex;
+  flex-wrap: wrap;
+  background: white;
+  border-radius: 20rpx;
+  box-shadow: 0 6rpx 12rpx rgba(0,0,0,0.08);
+  padding: 20rpx 0;
+}
+.grid-item {
+  width: 25%;
+  text-align: center;
+  margin: 30rpx 0;
+}
+.icon-box {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  margin: 0 auto 15rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon {
+  width: 60rpx;
+  height: 60rpx;
+}
+.label {
+  font-size: 26rpx;
+  color: #374151;
+}
+
+/* 彩色背景 */
+.bg-blue { background: #3b82f6; }
+.bg-orange { background: #f59e0b; }
+.bg-purple { background: #8b5cf6; }
+.bg-pink { background: #ec4899; }
+.bg-gray { background: #9ca3af; }
+.bg-red { background: #ef4444; }
+.bg-green { background: #10b981; }
+.bg-sky { background: #0ea5e9; }

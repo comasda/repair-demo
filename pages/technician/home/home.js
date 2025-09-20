@@ -1,21 +1,26 @@
 Page({
   data: {
-    user: {}
+    stats: {
+      pending: 3,
+      completed: 12,
+      income: 560
+    }
   },
+
   onShow() {
     const app = getApp()
     if (!app.checkLogin()) return
     const user = wx.getStorageSync('currentUser')
-    this.setData({ user })
+
+    // TODO: 请求后台，获取真实的工单/收益数据
   },
-  goTaskList() {
-    wx.showToast({ title: '跳转到工单列表（待开发）', icon: 'none' })
-  },
-  goProfile() {
-    wx.showToast({ title: '跳转到个人资料页面（待开发）', icon: 'none' })
-  },
-  logout() {
-    wx.removeStorageSync('currentUser')
-    wx.reLaunch({ url: '/pages/auth/login/login' })
-  }
+
+  goTasks() { wx.showToast({ title: '跳转工单列表', icon: 'none' }) },
+  goCompleted() { wx.showToast({ title: '跳转已完成工单', icon: 'none' }) },
+  goIncome() { wx.showToast({ title: '跳转收益记录', icon: 'none' }) },
+  goProfile() { wx.showToast({ title: '跳转我的资料', icon: 'none' }) },
+  goEvaluate() { wx.showToast({ title: '跳转工单评价', icon: 'none' }) },
+  goComplaint() { wx.showToast({ title: '跳转投诉处理', icon: 'none' }) },
+  goBills() { wx.showToast({ title: '跳转账务明细', icon: 'none' }) },
+  goAbout() { wx.showToast({ title: '跳转关于我们', icon: 'none' }) }
 })

@@ -1,7 +1,55 @@
 <view class="container">
-  <view class="header">👤 欢迎回来，客户 {{user.phone}}</view>
 
-  <button bindtap="goOrders">📦 我的订单</button>
-  <button bindtap="goNewOrder">🛠️ 我要报修</button>
-  <button bindtap="logout">退出登录</button>
+  <!-- 顶部统计卡片 -->
+  <view class="stats-card">
+    <view class="stat-item">
+      <text class="stat-num">{{stats.pending}}</text>
+      <text class="stat-label">未完工单</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-num">{{stats.balance}}</text>
+      <text class="stat-label">可用金额</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-num">{{stats.frozen}}</text>
+      <text class="stat-label">冻结金额</text>
+    </view>
+  </view>
+
+  <!-- 功能入口 -->
+  <view class="grid-card">
+    <view class="grid-item" bindtap="goNewOrder">
+      <view class="icon-box bg-blue"><image src="/assets/icons/add.png" class="icon"/></view>
+      <text class="label">新建工单</text>
+    </view>
+    <view class="grid-item" bindtap="goRecharge">
+      <view class="icon-box bg-orange"><image src="/assets/icons/recharge.png" class="icon"/></view>
+      <text class="label">账户充值</text>
+    </view>
+    <view class="grid-item" bindtap="goRecords">
+      <view class="icon-box bg-purple"><image src="/assets/icons/records.png" class="icon"/></view>
+      <text class="label">维修记录</text>
+    </view>
+    <view class="grid-item" bindtap="goEvaluate">
+      <view class="icon-box bg-pink"><image src="/assets/icons/evaluate.png" class="icon"/></view>
+      <text class="label">工单评价</text>
+    </view>
+    <view class="grid-item" bindtap="goProfile">
+      <view class="icon-box bg-gray"><image src="/assets/icons/account.png" class="icon"/></view>
+      <text class="label">我的账户</text>
+    </view>
+    <view class="grid-item" bindtap="goComplaint">
+      <view class="icon-box bg-red"><image src="/assets/icons/complaint.png" class="icon"/></view>
+      <text class="label">投诉建议</text>
+    </view>
+    <view class="grid-item" bindtap="goBills">
+      <view class="icon-box bg-green"><image src="/assets/icons/bills.png" class="icon"/></view>
+      <text class="label">账务明细</text>
+    </view>
+    <view class="grid-item" bindtap="goAbout">
+      <view class="icon-box bg-sky"><image src="/assets/icons/about.png" class="icon"/></view>
+      <text class="label">关于我们</text>
+    </view>
+  </view>
+
 </view>
