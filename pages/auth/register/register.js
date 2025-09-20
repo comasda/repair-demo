@@ -54,13 +54,23 @@ Page({
     wx.setStorageSync('users', users)
     wx.setStorageSync('currentUser', newUser)
 
-    wx.showToast({ title: '注册成功' })
-
+    wx.showToast({ 
+      title: '注册成功',
+      icon: 'success',
+      duration: 1000,
+      success: () => {
+        setTimeout(() => {
+          this.jumpByRole(role)
+        }, 1000)
+      }
+    })
     // 注册成功后跳转不同首页
-    if (role === 'customer') {
-      wx.switchTab({ url: '/pages/customer/home/home' })
-    } else if (role === 'technician') {
-      wx.switchTab({ url: '/pages/technician/home/home' })
+
+  },
+  jumpByRole(role) {
+      let target = '/pages/customer/home/home'
+      if (role === 'technician') target = '/pages/technician/home/home'
+      else if (role === 'admin') target = '/pages/admin/home/home'
+      wx.reLaunch({ url: target })   // ✅ reLaunch / navigateTo / switchTab 三选一
     }
-  }
 })
