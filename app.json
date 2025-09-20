@@ -6,10 +6,12 @@
     "pages/customer/home/home",
     "pages/customer/newOrder/newOrder",
     "pages/customer/orders/orders",
-    "pages/customer/orderDetail/orderDetail",
     "pages/technician/home/home",
     "pages/admin/home/home",
-    "pages/dashboard/dashboard"
+    "pages/dashboard/dashboard",
+    "pages/technician/pendingOrders/pendingOrders",
+    "pages/technician/myOrders/myOrders",
+    "pages/orderDetail/orderDetail"
   ],
 
   "usingComponents": {

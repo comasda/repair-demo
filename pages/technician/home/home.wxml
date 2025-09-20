@@ -22,9 +22,9 @@
       <view class="icon-box bg-blue"><image src="/assets/icons/tasks.png" class="icon"/></view>
       <text class="label">工单列表</text>
     </view>
-    <view class="grid-item" bindtap="goCompleted">
+    <view class="grid-item" bindtap="gomyOrders">
       <view class="icon-box bg-green"><image src="/assets/icons/completed.png" class="icon"/></view>
-      <text class="label">已完成工单</text>
+      <text class="label">我的工单</text>
     </view>
     <view class="grid-item" bindtap="goIncome">
       <view class="icon-box bg-orange"><image src="/assets/icons/income.png" class="icon"/></view>

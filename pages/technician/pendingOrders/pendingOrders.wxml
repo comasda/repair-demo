@@ -1,0 +1,18 @@
+<view class="container">
+  <view class="title">待接工单</view>
+
+  <block wx:for="{{orders}}" wx:key="id">
+    <view class="order-item">
+      <view class="order-title">{{item.title}}</view>
+      <view class="order-info">
+        <text>{{item.createdAt}}</text>
+        <text>{{item.phone}}</text>
+      </view>
+      <button class="btn-primary" bindtap="acceptOrder" data-id="{{item.id}}">接单</button>
+    </view>
+  </block>
+
+  <view wx:if="{{orders.length === 0}}" class="empty">
+    暂无待接工单
+  </view>
+</view>

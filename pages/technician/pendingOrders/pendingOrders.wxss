@@ -1,0 +1,7 @@
+.container { padding: 30rpx; }
+.title { font-size: 36rpx; font-weight: bold; margin-bottom: 20rpx; }
+.order-item { background: #fff; border: 1px solid #ddd; border-radius: 10rpx; padding: 20rpx; margin-bottom: 20rpx; }
+.order-title { font-size: 32rpx; font-weight: bold; margin-bottom: 10rpx; }
+.order-info { font-size: 26rpx; color: #666; display: flex; justify-content: space-between; }
+.btn-primary { background: linear-gradient(90deg, #10b981, #3b82f6); color: white; padding: 20rpx; border-radius: 50rpx; text-align: center; }
+.empty { text-align: center; color: #999; font-size: 28rpx; margin-top: 200rpx; }

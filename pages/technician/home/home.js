@@ -15,8 +15,8 @@ Page({
     // TODO: 请求后台，获取真实的工单/收益数据
   },
 
-  goTasks() { wx.showToast({ title: '跳转工单列表', icon: 'none' }) },
-  goCompleted() { wx.showToast({ title: '跳转已完成工单', icon: 'none' }) },
+  goTasks() {wx.navigateTo({ url: '/pages/technician/pendingOrders/pendingOrders' }) },
+  gomyOrders() {  wx.navigateTo({ url: '/pages/technician/myOrders/myOrders' }) },
   goIncome() { wx.showToast({ title: '跳转收益记录', icon: 'none' }) },
   goProfile() { wx.showToast({ title: '跳转我的资料', icon: 'none' }) },
   goEvaluate() { wx.showToast({ title: '跳转工单评价', icon: 'none' }) },

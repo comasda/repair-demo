@@ -30,16 +30,19 @@ Page({
     }
 
     // 模拟本地存储订单
+    const user = wx.getStorageSync('currentUser')
     let orders = wx.getStorageSync('orders') || []
+
     const newOrder = {
       id: Date.now(),
-      title,
-      desc,
-      phone,
-      address,
-      images,
+      title: this.data.title,
+      desc: this.data.desc,
+      phone: user.phone,
+      address: this.data.address,
+      images: this.data.images,
       status: '待接单',
-      createdAt: new Date().toLocaleString()
+      createdAt: new Date().toLocaleString(),
+      review: null
     }
     orders.push(newOrder)
     wx.setStorageSync('orders', orders)

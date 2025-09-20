@@ -14,6 +14,6 @@ Page({
 
   goDetail(e) {
     const id = e.currentTarget.dataset.id
-    wx.navigateTo({ url: `/pages/customer/orderDetail/orderDetail?id=${id}` })
+    wx.navigateTo({ url: `/pages/orderDetail/orderDetail?id=${id}` })
   }
 })
