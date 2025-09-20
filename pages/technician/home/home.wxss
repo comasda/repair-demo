@@ -1,0 +1,15 @@
+.container {
+  padding: 40rpx;
+}
+.header {
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 40rpx;
+}
+button {
+  margin: 20rpx 0;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  background: #16a34a;
+  color: white;
+}

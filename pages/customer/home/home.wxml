@@ -1,0 +1,7 @@
+<view class="container">
+  <view class="header">👤 欢迎回来，客户 {{user.phone}}</view>
+
+  <button bindtap="goOrders">📦 我的订单</button>
+  <button bindtap="goNewOrder">🛠️ 我要报修</button>
+  <button bindtap="logout">退出登录</button>
+</view>

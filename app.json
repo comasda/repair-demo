@@ -1,5 +1,10 @@
 {
   "pages": [
+    "pages/auth/login/login",
+    "pages/auth/register/register",
+    "pages/customer/home/home",
+    "pages/technician/home/home",
+    "pages/admin/home/home",
     "pages/index/index",
     "pages/orders/orders",
     "pages/orderDetail/orderDetail",

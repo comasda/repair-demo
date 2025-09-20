@@ -1,0 +1,7 @@
+<view class="container">
+  <view class="header">🧑‍🔧 欢迎回来，师傅 {{user.phone}}</view>
+
+  <button bindtap="goTaskList">📝 我的工单</button>
+  <button bindtap="goProfile">👤 个人资料</button>
+  <button bindtap="logout">退出登录</button>
+</view>

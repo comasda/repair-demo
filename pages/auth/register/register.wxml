@@ -1,0 +1,15 @@
+<view class="container">
+  <view class="title">用户注册</view>
+
+  <input type="text" placeholder="请输入手机号" bindinput="onPhoneInput" class="input"/>
+  <input type="password" placeholder="请输入密码" bindinput="onPwdInput" class="input"/>
+
+  <!-- 身份选择器 -->
+  <picker mode="selector" range="{{roles}}" bindchange="onRoleChange">
+    <view class="picker">
+      选择身份：{{roleText}}
+    </view>
+  </picker>
+
+  <button class="btn-primary" bindtap="registerUser">注册</button>
+</view>

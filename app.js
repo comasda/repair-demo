@@ -1,5 +1,9 @@
 App({
-  onLaunch() {
+ onLaunch: function() {
+    // 初始化用户存储
+    if (!wx.getStorageSync('users')) {
+      wx.setStorageSync('users', [])
+    }
     // 简单的“登录”与 UID 初始化
     if (!wx.getStorageSync('uid')) {
       const uid = 'uid-' + Math.random().toString(36).slice(2, 10)
@@ -28,5 +32,14 @@ App({
       ]
       wx.setStorageSync('orders', mockOrders)
     }
+  },
+
+  checkLogin: function() {
+    const user = wx.getStorageSync('currentUser')
+    if (!user) {
+      wx.redirectTo({ url: '/pages/auth/login/login' })
+      return false
+    }
+    return true
   }
 })
