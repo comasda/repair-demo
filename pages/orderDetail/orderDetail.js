@@ -1,5 +1,11 @@
 const { get, put } = require('../../utils/request')
 
+const statusMap = {
+  pending: '待接单',
+  assigned: '已接单',
+  done: '已完成'
+}
+
 Page({
   data: {
     order: null,
@@ -14,14 +20,20 @@ Page({
       return
     }
 
-    this.setData({ role: user.role })
+    this.setData({ 
+      role: user.role,
+      userId: user.id || user._id
+     })
     this.loadOrder(options.id)
   },
 
   // 获取单条工单详情
   loadOrder(id) {
     get(`/orders/${id}`).then(res => {
-      this.setData({ order: res })
+      this.setData({ 
+        order: res,
+        statusText: statusMap[res.status] || res.status  // 转中文
+      })
     }).catch(err => {
       wx.showToast({ title: '获取工单失败', icon: 'none' })
     })

@@ -1,22 +1,32 @@
 <view class="container" wx:if="{{order}}">
-  <view class="order-info">
-    <text>设备：{{order.device}}</text>
-    <text>问题：{{order.issue}}</text>
-    <text>状态：{{order.status}}</text>
-    <text>电话：{{order.phone}}</text>
-    <text>地址：{{order.address}}</text>
+  <view class="order-card">
+    <view class="order-header">
+      <text class="device">设备：{{order.device}}</text>
+      <text class="status">状态：{{statusText}}</text>
+    </view>
+
+    <view class="order-body">
+      <text>问题：{{order.issue}}</text>
+      <text>客户：{{order.customer}}</text>
+      <text>电话：{{order.phone || '未填写'}}</text>
+      <text>地址：{{order.address || '未填写'}}</text>
+    </view>
+
+    <!-- 图片展示 -->
+    <view wx:if="{{order.images && order.images.length > 0}}" class="order-images">
+      <block wx:for="{{order.images}}" wx:key="*this">
+        <image src="{{item}}" mode="aspectFill" class="order-img" />
+      </block>
+    </view>
   </view>
 
-  <!-- 历史记录 -->
-  <view class="order-history">
-    <block wx:for="{{order.history}}" wx:key="time">
-      <text>{{item.time}} - {{item.note}}</text>
-    </block>
-  </view>
+  <!-- 客户端：去评价按钮 -->
+  <button wx:if="{{role==='customer' && order.status==='done'}}" 
+          type="primary" 
+          bindtap="goReview">去评价</button>
 
-  <!-- 客户操作 -->
-  <button wx:if="{{role === 'customer'}}" bindtap="goReview">去评价</button>
-
-  <!-- 师傅操作 -->
-  <button wx:if="{{role === 'technician' && order.status !== 'done'}}" bindtap="markCompleted">标记完成</button>
+  <!-- 师傅端：只有接单后才显示完成按钮 -->
+  <button wx:if="{{role==='technician' && order.status==='assigned' && order.technicianId===userId}}" 
+          type="primary" 
+          bindtap="markCompleted">标记完成</button>
 </view>
