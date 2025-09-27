@@ -1,18 +1,30 @@
 <view class="container">
-  <view class="title">待接工单</view>
-
-  <block wx:for="{{orders}}" wx:key="id">
-    <view class="order-item">
-      <view class="order-title">{{item.title}}</view>
-      <view class="order-info">
-        <text>{{item.createdAt}}</text>
-        <text>{{item.phone}}</text>
+  <block wx:for="{{orders}}" wx:key="_id">
+    <view class="order-card">
+      <!-- 工单头部 -->
+      <view class="order-header">
+        <text class="device">设备：{{item.device}}</text>
+        <text class="status">{{item.statusText}}</text>
       </view>
-      <button class="btn-primary" bindtap="acceptOrder" data-id="{{item.id}}">接单</button>
+
+      <!-- 工单内容 -->
+      <view class="order-body">
+        <text>问题：{{item.issue}}</text>
+        <text>客户：{{item.customer}}</text>
+        <text>电话：{{item.phone || '未填写'}}</text>
+        <text>地址：{{item.address || '未填写'}}</text>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="order-actions">
+        <button type="primary" size="mini" data-id="{{item._id}}" bindtap="acceptOrder">接单</button>
+        <button type="default" size="mini" data-id="{{item._id}}" bindtap="goDetail">详情</button>
+      </view>
     </view>
   </block>
 
+  <!-- 空列表提示 -->
   <view wx:if="{{orders.length === 0}}" class="empty">
-    暂无待接工单
+    <text>暂无待接工单</text>
   </view>
 </view>

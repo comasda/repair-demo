@@ -15,6 +15,7 @@ Page({
 
     // 调用后端接口获取该师傅的工单
     get(`/orders?technicianId=${user.id}`).then(res => {
+      console.log('我的工单数据:', res)
       this.setData({ orders: res })
     }).catch(err => {
       wx.showToast({ title: '获取工单失败', icon: 'none' })

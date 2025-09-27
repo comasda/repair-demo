@@ -1,48 +1,45 @@
+const { get, put } = require('../../../utils/request')
+
 Page({
   data: {
     orders: []
   },
 
   onShow() {
-    const app = getApp()
-    if (!app.checkLogin()) return
-
-    // 当前师傅用户
     const user = wx.getStorageSync('currentUser')
-    if (user.role !== 'technician') {
-      wx.showToast({ title: '无权限', icon: 'none' })
+    if (!user || user.role !== 'technician') {
+      wx.showToast({ title: '请用师傅账号登录', icon: 'none' })
       return
     }
 
-    // 所有订单
-    let allOrders = wx.getStorageSync('orders') || []
-    // 筛选 status = 待接单 的
-    this.setData({
-      orders: allOrders.filter(o => o.status === '待接单')
+    // 获取待接单工单
+    get('/orders').then(res => {
+      console.log('后端返回的订单:', res)
+      const statusMap = { pending: '待接单', assigned: '已接单', done: '已完成' }
+      const pending = res.filter(o => o.status === 'pending')
+      pending.forEach(o => { o.statusText = statusMap[o.status] || o.status })
+      this.setData({ orders: pending })
     })
   },
 
+  // 师傅接单
   acceptOrder(e) {
     const id = e.currentTarget.dataset.id
-    let orders = wx.getStorageSync('orders') || []
-    const idx = orders.findIndex(o => o.id === id)
-    if (idx === -1) {
-      wx.showToast({ title: '订单不存在', icon: 'none' })
-      return
-    }
-
-    // 更新状态和师傅信息
     const user = wx.getStorageSync('currentUser')
-    orders[idx].status = '已接单'
-    orders[idx].technician = {
-      id: user.id,
-      phone: user.phone,
-      name: user.nickname || ''
-    }
-    wx.setStorageSync('orders', orders)
 
-    wx.showToast({ title: '接单成功' })
-    // 刷新页面
-    this.onShow()
+    put(`/orders/${id}/assign`, {
+      technicianId: user.id || user._id,   // 确保取到师傅的ID
+      technicianName: user.username || user.nickname || '师傅'
+    }).then(() => {
+      wx.showToast({ title: '接单成功' })
+      this.onShow() // 刷新列表
+    }).catch(err => {
+      wx.showToast({ title: err.message || '接单失败', icon: 'none' })
+    })
+  },
+
+  goDetail(e) {
+    const id = e.currentTarget.dataset.id
+    wx.navigateTo({ url: `/pages/orderDetail/orderDetail?id=${id}` })
   }
 })
