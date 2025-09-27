@@ -1,8 +1,11 @@
+// pages/orders/newOrder.js
+const { post } = require('../../../utils/request')
+
 Page({
   data: {
-    title: '',
-    desc: '',
-    images: [],
+    title: '',     // 设备名称
+    desc: '',      // 故障描述
+    images: [],    // 上传图片（当前只是选择，还未对接后端上传）
     phone: '',
     address: ''
   },
@@ -29,25 +32,34 @@ Page({
       return
     }
 
-    // 模拟本地存储订单
     const user = wx.getStorageSync('currentUser')
-    let orders = wx.getStorageSync('orders') || []
-
-    const newOrder = {
-      id: Date.now(),
-      title: this.data.title,
-      desc: this.data.desc,
-      phone: user.phone,
-      address: this.data.address,
-      images: this.data.images,
-      status: '待接单',
-      createdAt: new Date().toLocaleString(),
-      review: null
+    if (!user) {
+      wx.showToast({ title: '请先登录', icon: 'none' })
+      return
     }
-    orders.push(newOrder)
-    wx.setStorageSync('orders', orders)
 
-    wx.showToast({ title: '工单提交成功' })
-    wx.reLaunch({ url: '/pages/customer/home/home' })
+    // 调用后端接口创建订单
+    post('/orders', {
+      customer: user.username,   // 手机号 / 用户名
+      customerId: user.id,
+      device: title,
+      issue: desc,
+      phone,                     // 联系电话
+      address,                   // 地址
+      images                     // 图片（可以先存临时路径，后续改成上传到后端/OSS）
+    }).then(res => {
+      wx.showToast({
+        title: '工单提交成功',
+        icon: 'success',
+        duration: 1000,
+        success: () => {
+          setTimeout(() => {
+            wx.reLaunch({ url: '/pages/customer/home/home' })
+          }, 1000)
+        }
+      })
+    }).catch(err => {
+      wx.showToast({ title: err.message || '提交失败', icon: 'none' })
+    })
   }
 })
