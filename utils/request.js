@@ -1,35 +1,30 @@
 // utils/request.js
-const BASE_URL = "http://localhost:8080/api"; // ⚠️ 上线要改成你的域名
-
-function request({ url, method = "GET", data = {}, auth = true }) {
+const request = (url, method = 'GET', data = {}, options = {}) => {
   return new Promise((resolve, reject) => {
-    const header = { "Content-Type": "application/json" };
-    if (auth) {
-      const token = wx.getStorageSync("token");
-      if (token) header.Authorization = "Bearer " + token;
-    }
-
     wx.request({
-      url: BASE_URL + url,
+      url: `${getApp().globalData.API}${url}`,
       method,
       data,
-      header,
+      header: {
+        'Content-Type': 'application/json',
+        ...(options.header || {})
+      },
       success: (res) => {
-        if (res.statusCode === 401) {
-          wx.removeStorageSync("token");
-          wx.showToast({ title: "请先登录", icon: "none" });
-          wx.reLaunch({ url: "/pages/auth/login/login" });
-          reject(res.data);
-        } else if (res.statusCode >= 400) {
-          wx.showToast({ title: res.data.message || "请求错误", icon: "none" });
-          reject(res.data);
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          resolve(res.data)
         } else {
-          resolve(res.data);
+          reject(res.data || { message: '请求失败', statusCode: res.statusCode })
         }
       },
-      fail: reject,
-    });
-  });
+      fail: (err) => reject(err)
+    })
+  })
 }
 
-module.exports = { request };
+// 常用方法简化
+const get = (url, data, options) => request(url, 'GET', data, options)
+const post = (url, data, options) => request(url, 'POST', data, options)
+const put = (url, data, options) => request(url, 'PUT', data, options)
+const del = (url, data, options) => request(url, 'DELETE', data, options)
+
+module.exports = { request, get, post, put, del }
