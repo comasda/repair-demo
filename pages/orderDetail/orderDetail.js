@@ -1,34 +1,49 @@
+const { get, put } = require('../../utils/request')
+
 Page({
   data: {
-    order: {},
-    role: '' // 当前用户角色
+    order: null,
+    role: ''
   },
 
   onLoad(options) {
-    const id = Number(options.id)
-    const orders = wx.getStorageSync('orders') || []
-    const order = orders.find(o => o.id === id) || {}
-
     const user = wx.getStorageSync('currentUser')
-    const role = user ? user.role : ''
+    if (!user) {
+      wx.showToast({ title: '请先登录', icon: 'none' })
+      wx.reLaunch({ url: '/pages/auth/login/login' })
+      return
+    }
 
-    this.setData({ order, role })
+    this.setData({ role: user.role })
+    this.loadOrder(options.id)
+  },
+
+  // 获取单条工单详情
+  loadOrder(id) {
+    get(`/orders/${id}`).then(res => {
+      this.setData({ order: res })
+    }).catch(err => {
+      wx.showToast({ title: '获取工单失败', icon: 'none' })
+    })
   },
 
   // 客户端：去评价
   goReview() {
-    wx.navigateTo({ url: `/pages/customer/review/review?id=${this.data.order.id}` })
+    const id = this.data.order._id
+    wx.navigateTo({ url: `/pages/customer/review/review?id=${id}` })
   },
 
-  // 师傅端：完成工单
+  // 师傅端：标记工单完成
   markCompleted() {
-    const orders = wx.getStorageSync('orders') || []
-    const idx = orders.findIndex(o => o.id === this.data.order.id)
-    if (idx !== -1) {
-      orders[idx].status = '已完成'
-      wx.setStorageSync('orders', orders)
+    const id = this.data.order._id
+    put(`/orders/${id}/status`, {
+      status: 'done',
+      note: '工单已完成'
+    }).then(() => {
       wx.showToast({ title: '工单已完成' })
-      this.setData({ order: orders[idx] })
-    }
+      this.loadOrder(id) // 刷新详情
+    }).catch(err => {
+      wx.showToast({ title: '操作失败', icon: 'none' })
+    })
   }
 })

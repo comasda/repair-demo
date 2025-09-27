@@ -1,79 +1,22 @@
-<view class="container">
-  <!-- 通用：标题 -->
-  <view class="title">{{order.title}}</view>
-
-  <!-- 通用：描述 -->
-  <view class="section">
-    <text class="label">描述：</text>
-    <text>{{order.desc}}</text>
+<view class="container" wx:if="{{order}}">
+  <view class="order-info">
+    <text>设备：{{order.device}}</text>
+    <text>问题：{{order.issue}}</text>
+    <text>状态：{{order.status}}</text>
+    <text>电话：{{order.phone}}</text>
+    <text>地址：{{order.address}}</text>
   </view>
 
-  <!-- 通用：状态 -->
-  <view class="section">
-    <text class="label">状态：</text>
-    <text>{{order.status}}</text>
-  </view>
-
-  <!-- 通用：提交时间 -->
-  <view class="section">
-    <text class="label">提交时间：</text>
-    <text>{{order.createdAt}}</text>
-  </view>
-
-  <!-- 客户端：显示自己的联系方式和地址 -->
-  <view wx:if="{{role==='customer'}}">
-    <view class="section">
-      <text class="label">联系方式：</text>
-      <text>{{order.phone}}</text>
-    </view>
-    <view class="section">
-      <text class="label">地址：</text>
-      <text>{{order.address}}</text>
-    </view>
-  </view>
-
-  <!-- 已接单时显示师傅信息 -->
-  <view wx:if="{{order.status==='已接单' || order.status==='已完成'}}">
-    <view class="section">
-      <text class="label">接单师傅：</text>
-      <text>{{order.technician.name || '未填写'}}</text>
-    </view>
-    <view class="section">
-      <text class="label">联系方式：</text>
-      <text>{{order.technician.phone}}</text>
-    </view>
-  </view>
-
-  <!-- 师傅端：显示客户联系方式和地址 -->
-  <view wx:if="{{role==='technician'}}">
-    <view class="section">
-      <text class="label">客户联系方式：</text>
-      <text>{{order.phone}}</text>
-    </view>
-    <view class="section">
-      <text class="label">客户地址：</text>
-      <text>{{order.address}}</text>
-    </view>
-    <view wx:if="{{order.status==='已接单'}}" class="section">
-      <button class="btn-primary" bindtap="markCompleted">完成工单</button>
-    </view>
-  </view>
-
-  <!-- 客户端：评价 -->
-  <view wx:if="{{role==='customer'}}">
-    <view wx:if="{{order.status==='已完成' && !order.review}}" class="section">
-      <button class="btn-primary" bindtap="goReview">去评价</button>
-    </view>
-    <view wx:if="{{order.review}}" class="section">
-      <text class="label">我的评价：</text>
-      <text>{{order.review.rating}} 星 - {{order.review.comment}}</text>
-    </view>
-  </view>
-
-  <!-- 通用：图片展示 -->
-  <view class="images">
-    <block wx:for="{{order.images}}" wx:key="*this">
-      <image src="{{item}}" class="preview" mode="aspectFill"></image>
+  <!-- 历史记录 -->
+  <view class="order-history">
+    <block wx:for="{{order.history}}" wx:key="time">
+      <text>{{item.time}} - {{item.note}}</text>
     </block>
   </view>
+
+  <!-- 客户操作 -->
+  <button wx:if="{{role === 'customer'}}" bindtap="goReview">去评价</button>
+
+  <!-- 师傅操作 -->
+  <button wx:if="{{role === 'technician' && order.status !== 'done'}}" bindtap="markCompleted">标记完成</button>
 </view>

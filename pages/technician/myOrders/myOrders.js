@@ -1,3 +1,5 @@
+const { get } = require('../../../utils/request')
+
 Page({
   data: {
     orders: []
@@ -11,10 +13,11 @@ Page({
       return
     }
 
-    let orders = wx.getStorageSync('orders') || []
-    // 过滤出当前师傅的工单
-    this.setData({
-      orders: orders.filter(o => o.technician && o.technician.id === user.id)
+    // 调用后端接口获取该师傅的工单
+    get(`/orders?technicianId=${user.id}`).then(res => {
+      this.setData({ orders: res })
+    }).catch(err => {
+      wx.showToast({ title: '获取工单失败', icon: 'none' })
     })
   },
 
