@@ -1,17 +1,25 @@
 <view class="container">
-  <view class="title">我的工单</view>
+  <text class="title">我的工单</text>
 
-  <block wx:for="{{orders}}" wx:key="id">
-    <view class="order-item" bindtap="goDetail" data-id="{{item.id}}">
-      <view class="order-title">{{item.title}}</view>
-      <view class="order-info">
-        <text>{{item.status}}</text>
-        <text>{{item.createdAt}}</text>
+  <block wx:for="{{orders}}" wx:key="_id">
+    <view class="order-card" data-id="{{item._id}}" bindtap="goDetail">
+      <!-- 工单头部：状态 + 时间 -->
+      <view class="order-header">
+        <text class="status">{{item.statusText}}</text>
+        <text class="time">{{item.time}}</text>
+      </view>
+
+      <!-- 工单主体：设备、问题、师傅 -->
+      <view class="order-body">
+        <text>设备：{{item.device}}</text>
+        <text>问题：{{item.issue}}</text>
+        <text>师傅：{{item.technicianName || '未分配'}}</text>
       </view>
     </view>
   </block>
 
+  <!-- 空数据提示 -->
   <view wx:if="{{orders.length === 0}}" class="empty">
-    暂无工单
+    <text>暂无工单</text>
   </view>
 </view>
