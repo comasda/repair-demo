@@ -58,3 +58,7 @@
   border-radius: 50rpx;
   text-align: center;
 }
+
+.form-item { margin: 16rpx 0; }
+.row { display: flex; align-items: center; }
+.location-hint { color: #666; font-size: 26rpx; margin-top: 8rpx; }

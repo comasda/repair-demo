@@ -6,27 +6,40 @@
     </view>
 
     <view class="order-body">
-      <text>问题：{{order.issue}}</text>
-      <text>客户：{{order.customer}}</text>
-      <text>电话：{{order.phone || '未填写'}}</text>
-      <text>地址：{{order.address || '未填写'}}</text>
+      <text class="line">问题：{{order.issue}}</text>
+      <text class="line">客户：{{order.customer}}</text>
+      <text class="line">电话：{{order.phone || '未填写'}}</text>
+      <text class="line">地址：{{order.address || '未填写'}}</text>
+      <text class="line">下单时间：{{order.time}}</text>
     </view>
 
-    <!-- 图片展示 -->
-    <view wx:if="{{order.images && order.images.length > 0}}" class="order-images">
+    <!-- 图片（如有） -->
+    <view wx:if="{{order.images && order.images.length}}" class="order-images">
       <block wx:for="{{order.images}}" wx:key="*this">
-        <image src="{{item}}" mode="aspectFill" class="order-img" />
+        <image class="order-img" mode="aspectFill" src="{{item}}" />
       </block>
     </view>
   </view>
 
-  <!-- 客户端：去评价按钮 -->
-  <button wx:if="{{role==='customer' && order.status==='done'}}" 
-          type="primary" 
-          bindtap="goReview">去评价</button>
+  <!-- 签到记录 -->
+  <view class="order-card" wx:if="{{order.checkins && order.checkins.length}}">
+    <view class="order-header"><text>签到记录</text></view>
+    <view class="order-body">
+      <block wx:for="{{order.checkins}}" wx:key="time">
+        <text class="line">{{item.time}} {{item.address || (item.lat + ',' + item.lng)}}（{{item.technicianName}}）</text>
+      </block>
+    </view>
+  </view>
 
-  <!-- 师傅端：只有接单后才显示完成按钮 -->
-  <button wx:if="{{role==='technician' && order.status==='assigned' && order.technicianId===userId}}" 
-          type="primary" 
-          bindtap="markCompleted">标记完成</button>
+  <!-- 客户端：去评价（可按你业务限定显示时机，例如订单已完成时） -->
+  <button wx:if="{{role==='customer' && order.status==='done'}}"
+          type="primary" bindtap="goReview">去评价</button>
+
+  <!-- 师傅端：到场签到（仅已接单且是当前师傅本人） -->
+  <button wx:if="{{role==='technician' && order.status==='assigned' && order.technicianId===userId}}"
+          type="primary" bindtap="checkin">到场签到</button>
+
+  <!-- 师傅端：标记完成（仅已接单且是当前师傅本人） -->
+  <button wx:if="{{role==='technician' && order.status==='assigned' && order.technicianId===userId}}"
+          type="primary" bindtap="markCompleted" style="margin-top: 16rpx;">标记完成</button>
 </view>

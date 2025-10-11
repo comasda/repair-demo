@@ -25,5 +25,9 @@
     "backgroundTextStyle": "light"
   },
   "style": "v2",
-  "sitemapLocation": "sitemap.json"
+  "sitemapLocation": "sitemap.json",
+  "permission": {
+    "scope.userLocation": { "desc": "用于上门维修定位与路径规划" }
+  },
+  "requiredPrivateInfos": ["getLocation","chooseLocation"]
 }

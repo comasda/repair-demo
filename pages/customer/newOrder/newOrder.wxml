@@ -17,7 +17,19 @@
 
   <input class="input" placeholder="请输入联系方式" bindinput="onPhoneInput" />
 
-  <input class="input" placeholder="请输入地址" bindinput="onAddressInput" />
+  <view class="form-item">
+    <input placeholder="请输入详细地址" bindinput="onAddressInput" value="{{address}}" />
+  </view>
+
+  <view class="form-item row">
+    <button type="primary" size="mini" bindtap="chooseLocation">选择位置</button>
+    <button type="default" size="mini" bindtap="getCurrentLocation" style="margin-left: 16rpx;">使用当前位置</button>
+  </view>
+
+  <view wx:if="{{location}}" class="location-hint">
+    <text>已选择位置：</text>
+    <text>{{locationAddress || '已获取坐标'}}（{{location.lat}}, {{location.lng}}）</text>
+  </view>
 
   <button class="btn-primary" bindtap="submitOrder">提交工单</button>
 </view>
