@@ -5,20 +5,22 @@ Page({
     orderId: '',
     rating: 5,
     content: '',
-    images: []
+    images: [],
+    mode: 'first',     // 新增：first | append
+    btnText: '提交评价',
+    navTitle: '提交评价'
   },
 
   onLoad(options) {
-    this.setData({ orderId: options.id || '' })
+    const mode = options.mode || 'first'
+    const navTitle = mode === 'append' ? '追加评价' : '提交评价'
+    const btnText = mode === 'append' ? '提交追加评价' : '提交评价'
+    this.setData({ orderId: options.id || '', mode, navTitle, btnText })
+    wx.setNavigationBarTitle({ title: navTitle })
   },
 
-  onRate(e) {
-    this.setData({ rating: Number(e.currentTarget.dataset.value) })
-  },
-
-  onInput(e) {
-    this.setData({ content: e.detail.value })
-  },
+  onRate(e) { this.setData({ rating: Number(e.currentTarget.dataset.value) }) },
+  onInput(e) { this.setData({ content: e.detail.value }) },
 
   chooseImage() {
     wx.chooseImage({
@@ -27,7 +29,7 @@ Page({
     })
   },
 
-  submit() {
+  async submit() {
     const user = wx.getStorageSync('currentUser')
     if (!user) { wx.showToast({ title: '请先登录', icon: 'none' }); return }
 
@@ -37,17 +39,16 @@ Page({
       return wx.showToast({ title: '请先评分(1-5)', icon: 'none' })
     }
 
-    post(`/orders/${orderId}/reviews`, {
+    // 这里仍然直接提交；若要上线存图，请先把 tmp 转成 URL 再提交
+    await post(`/orders/${orderId}/reviews`, {
       customerId: user.id || user._id,
       customerName: user.username || user.nickname || '',
       rating,
       content: content || '',
-      images // 如需真正上传到服务器/云存储，这里可改为上传后得到 URL 再提交
-    }).then(() => {
-      wx.showToast({ title: '评价成功' })
-      setTimeout(() => wx.navigateBack(), 800)
-    }).catch(err => {
-      wx.showToast({ title: err.message || '提交失败', icon: 'none' })
+      images
     })
+
+    wx.showToast({ title: this.data.mode === 'append' ? '追加成功' : '评价成功' })
+    setTimeout(() => wx.navigateBack(), 800)
   }
 })

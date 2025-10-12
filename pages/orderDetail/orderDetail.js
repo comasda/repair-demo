@@ -23,7 +23,9 @@ Page({
     role: '',
     userId: '',
     userName: '',
-    statusText: ''
+    statusText: '',
+    reviews: [],
+    hasMyReview: false
   },
 
   onLoad(options) {
@@ -48,17 +50,30 @@ Page({
       res._lat = loc.lat != null ? loc.lat : res.lat
       res._lng = loc.lng != null ? loc.lng : res.lng
 
+      // ↓ 评价处理：把 reviews 放进 data，并判断是否有我自己的评价
+      const reviews = Array.isArray(res.reviews) ? res.reviews : []
+      const me = this.data.userId
+      const hasMyReview = reviews.some(r => r.customerId === me)
+
       this.setData({
         order: res,
-        statusText: statusMap[res.status] || res.status
+        statusText: statusMap[res.status] || res.status,
+        reviews,
+        hasMyReview
       })
     }).catch(() => wx.showToast({ title: '获取工单失败', icon: 'none' }))
   },
 
-  // —— 客户端：去评价（按你的业务条件显示）——
+  // —— 客户端：去评价 ——（未评价时显示）
   goReview() {
     const id = this.data.order._id
-    wx.navigateTo({ url: `/pages/customer/review/review?id=${id}` })
+    wx.navigateTo({ url: `/pages/customer/review/review?id=${id}&mode=first` })
+  },
+
+  // —— 客户端：追加评价 ——（已评价时显示）
+  goAppendReview() {
+    const id = this.data.order._id
+    wx.navigateTo({ url: `/pages/customer/review/review?id=${id}&mode=append` })
   },
 
   // —— 师傅端：到场签到（自动获取定位 & 距离判断）——

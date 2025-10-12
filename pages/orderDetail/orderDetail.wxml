@@ -31,9 +31,42 @@
     </view>
   </view>
 
-  <!-- 客户端：去评价（可按你业务限定显示时机，例如订单已完成时） -->
-  <button wx:if="{{role==='customer' && order.status==='done'}}"
-          type="primary" bindtap="goReview">去评价</button>
+<!-- 评价按钮（二选一） -->
+<button wx:if="{{role==='customer' && order.status==='done' && !hasMyReview}}"
+        type="primary" bindtap="goReview">去评价</button>
+
+<button wx:if="{{role==='customer' && order.status==='done' && hasMyReview}}"
+        type="primary" bindtap="goAppendReview">追加评价</button>
+
+<!-- 评价列表（如有） -->
+<view wx:if="{{reviews.length}}" style="margin-top:16rpx;">
+  <view style="font-weight:600;margin-bottom:8rpx;">评价</view>
+  <block wx:for="{{reviews}}" wx:key="time">
+    <view style="background:#fff;border-radius:12rpx;padding:16rpx;margin-bottom:12rpx;">
+      <view style="display:flex;justify-content:space-between;">
+        <text>{{item.customerName || '匿名'}}</text>
+        <text style="color:#999;">{{item.time}}</text>
+      </view>
+      <view style="margin:6rpx 0;">
+        <view class="stars">
+          <!-- 点亮的星 -->
+          <block wx:for="{{item.rating}}" wx:key="*this">
+            <text style="color:#ffb400;">★</text>
+          </block>
+
+          <!-- 灰色的星 -->
+          <block wx:for="{{5 - item.rating}}" wx:key="*this">
+            <text style="color:#ddd;">★</text>
+          </block>
+        </view>
+      </view>
+      <view style="color:#333;">{{item.content}}</view>
+      <view wx:if="{{item.images && item.images.length}}" style="display:flex;gap:8rpx;flex-wrap:wrap;margin-top:8rpx;">
+        <image wx:for="{{item.images}}" wx:key="*this" src="{{item}}" mode="aspectFill" style="width:160rpx;height:160rpx;border-radius:8rpx;" />
+      </view>
+    </view>
+  </block>
+</view>
 
   <!-- 师傅端：到场签到（仅已接单且是当前师傅本人） -->
   <button wx:if="{{role==='technician' && order.status==='assigned' && order.technicianId===userId}}"

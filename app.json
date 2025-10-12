@@ -11,7 +11,9 @@
     "pages/dashboard/dashboard",
     "pages/technician/pendingOrders/pendingOrders",
     "pages/technician/myOrders/myOrders",
-    "pages/orderDetail/orderDetail"
+    "pages/orderDetail/orderDetail",
+    "pages/customer/review/review",
+    "pages/customer/evaluate/evaluate"
   ],
 
   "usingComponents": {

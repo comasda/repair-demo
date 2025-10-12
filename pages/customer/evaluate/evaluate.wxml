@@ -1,5 +1,5 @@
 <view class="container">
-  <view class="title">已完成工单（可评价）</view>
+  <view class="title">已完成工单</view>
 
   <view wx:if="{{loading}}" class="hint">加载中...</view>
 
