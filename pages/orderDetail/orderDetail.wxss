@@ -34,3 +34,9 @@
   height: 200rpx;
   border-radius: 8rpx;
 }
+
+.primary-btn.disabled {
+  opacity: 0.5;
+}
+.hint { margin: 16rpx 0; color: #666; font-size: 26rpx; }
+.hint .sub { color: #999; font-size: 24rpx; }

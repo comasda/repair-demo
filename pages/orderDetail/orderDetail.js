@@ -1,7 +1,7 @@
 // pages/orderDetail/orderDetail.js
 const { get, put, post } = require('../../utils/request')
 
-const statusMap = { pending: '待接单', assigned: '已接单', done: '已完成' }
+const statusMap = { pending: '待接单', assigned: '已接单', checkedIn: '已签到', awaitingConfirm: '待确认', done: '已完成' }
 const CHECKIN_RADIUS_M = 200  // 你可以改为 300/500
 
 // 计算两点经纬度的哈弗辛距离（米）
@@ -56,11 +56,8 @@ Page({
       const hasMyReview = reviews.some(r => r.customerId === me)
       
       let statusText
-      if (res.status === 'checkedIn') {
-        statusText = (this.data.role === 'technician') ? '已签到' : '已接单'
-      } else {
-        statusText = statusMap[res.status] || res.status
-      }
+      // 统一用 statusMap（已含 checkedIn/awaitingConfirm），若无则回退原值
+      statusText = statusMap[res.status] || res.status
       this.setData({
         order: res,
         statusText,
@@ -182,12 +179,38 @@ Page({
     })
   },
 
-  // —— 师傅端：标记完成（仅本人&已接单）——
-  markCompleted() {
-    const id = this.data.order._id
-    put(`/orders/${id}/status`, { status: 'done', note: '工单已完成' })
-      .then(() => { wx.showToast({ title: '工单已完成' }); this.loadOrder(id) })
-      .catch(() => wx.showToast({ title: '操作失败', icon: 'none' }))
+  // —— 师傅端：发起完成（仅在已签到时可用）——
+  requestComplete() {
+    const { order, role, userId } = this.data
+    if (!order) return
+    if (role !== 'technician') {
+      wx.showToast({ title: '仅师傅可发起完成', icon: 'none' }); return
+    }
+    if (order.status !== 'checkedIn') {
+      wx.showToast({ title: '需到场签到后才能发起完成', icon: 'none' }); return
+    }
+    post(`/orders/${order._id}/complete-request`, { technicianId: userId })
+      .then(() => { wx.showToast({ title: '已发起完成，等待客户确认' }); this.loadOrder(order._id) })
+      .catch(err => wx.showToast({ title: err.message || '操作失败', icon: 'none' }))
+  },
+
+  // —— 客户端：确认完成（仅在待确认时可用）——
+  confirmComplete() {
+    const { order, role, userId } = this.data
+    if (!order) return
+    if (role !== 'customer') {
+      wx.showToast({ title: '仅客户可确认完成', icon: 'none' }); return
+    }
+    if (order.status !== 'awaitingConfirm') {
+      wx.showToast({ title: '当前状态不可确认', icon: 'none' }); return
+    }
+    post(`/orders/${order._id}/complete-confirm`, { customerId: userId })
+      .then(() => {
+        wx.showToast({ title: '订单已完成' })
+        // 可选：完成后引导去评价
+        setTimeout(() => this.goReview(), 600)
+      })
+      .catch(err => wx.showToast({ title: err.message || '操作失败', icon: 'none' }))
   },
   // —— 师傅端：查看用户评价（仅在已完成时展示按钮）——
    goTechViewReview() {
