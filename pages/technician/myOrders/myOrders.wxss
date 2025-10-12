@@ -1,11 +1,33 @@
-.container {
-  padding: 20rpx;
+/* tabs 样式 */
+.tabs {
+  display: flex;
+  background: #fff;
+  padding: 16rpx;
+  border-radius: 12rpx;
+  margin: 20rpx;
+  gap: 12rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,.04);
+}
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 12rpx 0;
+  border-radius: 999rpx;
+  color: #666;
+  border: 1rpx solid #eee;
+}
+.tab-item.active {
+  color: #1677ff;
+  border-color: #1677ff;
+  font-weight: 600;
+  background: #eaf3ff;
 }
 
-.title {
-  font-size: 32rpx;
-  font-weight: bold;
-  margin-bottom: 20rpx;
+/* loading / 空态 */
+.loading, .empty {
+  text-align: center;
+  color: #999;
+  margin-top: 60rpx;
 }
 
 .order-card {

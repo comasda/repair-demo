@@ -3,6 +3,7 @@ const { get } = require('../../../utils/request')
 const statusMap = {
   pending: '待接单',
   assigned: '已接单',
+  checkedIn: '已接单', 
   done: '已完成'
 }
 
@@ -25,7 +26,7 @@ Page({
   },
 
   // 通用拉取函数：根据当前 tab 携带 status 请求
-  fetchOrders() {
+ async fetchOrders() {
     const user = wx.getStorageSync('currentUser')
     if (!user || user.role !== 'customer') {
       wx.showToast({ title: '请用客户账号登录', icon: 'none' })
@@ -35,20 +36,33 @@ Page({
     const customerId = user.id || user._id
 
     const tab = this.data.tabs[this.data.currentTab]
-    const statusQuery = tab.status ? `&status=${tab.status}` : ''   // ⭐ 有状态则拼上
     this.setData({ loading: true })
-    get(`/orders?customerId=${customerId}${statusQuery}`)
-      .then(res => {
-        const mapped = (res || []).map(o => ({
-          ...o,
-          statusText: statusMap[o.status] || o.status
-        }))
-        this.setData({ orders: mapped, loading: false })
-      })
-      .catch(() => {
-        wx.showToast({ title: '获取工单失败', icon: 'none' })
-        this.setData({ loading: false })
-      })
+    try {
+      let list = []
+
+      if (tab.key === 'assigned') {
+        const [a, c] = await Promise.all([
+          get(`/orders?customerId=${customerId}&status=assigned`),
+          get(`/orders?customerId=${customerId}&status=checkedIn`)
+        ])
+        // 合并（按 _id 去重）
+        const map = new Map()
+        ;[...(a||[]), ...(c||[])].forEach(o => map.set(o._id, o))
+        list = Array.from(map.values())
+      } else {
+        const statusQuery = tab.status ? `&status=${tab.status}` : ''
+        list = await get(`/orders?customerId=${customerId}${statusQuery}`)
+      }
+
+      const mapped = (list || []).map(o => ({
+        ...o,
+        statusText: statusMap[o.status] || o.status
+      }))
+      this.setData({ orders: mapped, loading: false })
+    } catch (e) {
+      wx.showToast({ title: '获取工单失败', icon: 'none' })
+      this.setData({ loading: false })
+    }
   },
 
   // 生命周期：进入页面/返回显示时都按当前 tab 拉取

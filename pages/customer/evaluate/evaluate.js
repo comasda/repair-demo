@@ -1,6 +1,6 @@
 const { get } = require('../../../utils/request')
 
-const statusMap = { pending: '待接单', assigned: '已接单', done: '已完成' }
+const statusMap = { pending: '待接单', assigned: '已接单', checkedIn: '已接单', done: '已完成' }
 
 Page({
   data: {

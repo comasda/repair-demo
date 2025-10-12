@@ -1,39 +1,57 @@
 const { get } = require('../../../utils/request')
 
-const statusMap = {
-  pending: '待接单',
-  assigned: '已接单',
-  done: '已完成'
-}
+const statusMap = { pending: '待接单', assigned: '待签到', checkedIn: '已签到', done: '已完成' }
+
+const tabs = [
+  { key: 'all', label: '全部', status: '' },
+  { key: 'assigned', label: '待签到', status: 'assigned' },
+  { key: 'checkedIn', label: '已签到', status: 'checkedIn' },
+  { key: 'done', label: '已完成', status: 'done' }
+]
 
 Page({
   data: {
-    orders: []
+    tabs,
+    currentTab: 0,
+    orders: [],
+    loading: false
   },
 
-  onShow() {
+  fetchOrders() {
     const user = wx.getStorageSync('currentUser')
     if (!user || user.role !== 'technician') {
       wx.showToast({ title: '请用师傅账号登录', icon: 'none' })
       wx.reLaunch({ url: '/pages/auth/login/login' })
       return
     }
-
-    // 兼容 _id / id
     const technicianId = user.id || user._id
+    const tab = this.data.tabs[this.data.currentTab]
+    const statusQuery = tab.status ? `&status=${tab.status}` : ''
+    this.setData({ loading: true })
 
-    // 调用后端接口获取该师傅的工单
-    get(`/orders?technicianId=${technicianId}`).then(res => {
-      const mapped = res.map(o => ({
-        ...o,
-        statusText: statusMap[o.status] || o.status
-      }))
-      console.log('我的工单数据:', mapped)
-      this.setData({ orders: mapped })
-    }).catch(err => {
-      wx.showToast({ title: '获取工单失败', icon: 'none' })
-    })
+    get(`/orders?technicianId=${technicianId}${statusQuery}`)
+      .then(res => {
+        const mapped = (res || []).map(o => ({
+          ...o,
+          statusText: statusMap[o.status] || o.status
+        }))
+        this.setData({ orders: mapped, loading: false })
+      })
+      .catch(() => {
+        wx.showToast({ title: '获取工单失败', icon: 'none' })
+        this.setData({ loading: false })
+      })
   },
+
+  // 切换 tab 后拉取
+  onTabChange(e) {
+    const index = Number(e.currentTarget.dataset.index)
+    if (index === this.data.currentTab) return
+    this.setData({ currentTab: index }, () => this.fetchOrders())
+  },
+
+  // 生命周期：进入页面或返回时刷新
+  onShow() { this.fetchOrders() },
 
   goDetail(e) {
     const id = e.currentTarget.dataset.id

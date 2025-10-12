@@ -1,23 +1,34 @@
-<view class="container">
-  <text class="title">我的工单</text>
-
-  <block wx:for="{{orders}}" wx:key="_id">
-    <view class="order-card" data-id="{{item._id}}" bindtap="goDetail">
-      <view class="order-header">
-        <text class="status">{{item.statusText}}</text>
-        <text class="time">{{item.time}}</text>
-      </view>
-      <view class="order-body">
-        <text>设备：{{item.device}}</text>
-        <text>问题：{{item.issue}}</text>
-        <text>客户：{{item.customer}}</text>
-        <text>电话：{{item.phone || '未填写'}}</text>
-        <text>地址：{{item.address || '未填写'}}</text>
-      </view>
+<!-- 顶部状态切换 -->
+<view class="tabs">
+  <block wx:for="{{tabs}}" wx:key="key">
+    <view
+      class="tab-item {{index === currentTab ? 'active' : ''}}"
+      data-index="{{index}}"
+      bindtap="onTabChange"
+    >
+      {{item.label}}
     </view>
   </block>
-
-  <view wx:if="{{orders.length === 0}}" class="empty">
-    <text>暂无工单</text>
-  </view>
 </view>
+
+<!-- 加载提示 -->
+<view wx:if="{{loading}}" class="loading">加载中...</view>
+
+<block wx:for="{{orders}}" wx:key="_id">
+  <view class="order-card" data-id="{{item._id}}" bindtap="goDetail">
+    <view class="order-header">
+      <text class="status">{{item.statusText}}</text>
+      <text class="time">{{item.time}}</text>
+    </view>
+    <view class="order-body">
+      <text>设备：{{item.device}}</text>
+      <text>问题：{{item.issue}}</text>
+      <text>客户：{{item.customer}}</text>
+      <text>电话：{{item.phone || '未填写'}}</text>
+      <text>地址：{{item.address || '未填写'}}</text>
+    </view>
+  </view>
+</block>
+
+<!-- 】空态 -->
+<view wx:if="{{!loading && orders.length === 0}}" class="empty">暂无该状态的工单</view>

@@ -54,10 +54,16 @@ Page({
       const reviews = Array.isArray(res.reviews) ? res.reviews : []
       const me = this.data.userId
       const hasMyReview = reviews.some(r => r.customerId === me)
-
+      
+      let statusText
+      if (res.status === 'checkedIn') {
+        statusText = (this.data.role === 'technician') ? '已签到' : '已接单'
+      } else {
+        statusText = statusMap[res.status] || res.status
+      }
       this.setData({
         order: res,
-        statusText: statusMap[res.status] || res.status,
+        statusText,
         reviews,
         hasMyReview
       })
