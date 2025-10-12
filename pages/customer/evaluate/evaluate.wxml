@@ -1,0 +1,19 @@
+<view class="container">
+  <view class="title">已完成工单（可评价）</view>
+
+  <view wx:if="{{loading}}" class="hint">加载中...</view>
+
+  <block wx:for="{{orders}}" wx:key="_id">
+    <view class="card" data-id="{{item._id}}" bindtap="goDetail">
+      <view class="row between">
+        <text class="status">{{item.statusText}}</text>
+        <text class="time">{{item.time}}</text>
+      </view>
+      <view class="row">设备：{{item.device}}</view>
+      <view class="row">问题：{{item.issue}}</view>
+      <view class="row">师傅：{{item.technicianName || '未分配'}}</view>
+    </view>
+  </block>
+
+  <view wx:if="{{!loading && orders.length === 0}}" class="hint">暂无已完成工单</view>
+</view>

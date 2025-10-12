@@ -35,7 +35,7 @@ Page({
     wx.navigateTo({ url: '/pages/customer/myOrders/myOrders' })
   },
   goEvaluate() {
-    wx.showToast({ title: '跳转工单评价', icon: 'none' })
+     wx.navigateTo({ url: '/pages/customer/evaluate/evaluate' })
   },
   goProfile() {
     wx.showToast({ title: '跳转我的账户', icon: 'none' })

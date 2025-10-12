@@ -1,0 +1,21 @@
+<view class="container">
+  <view class="card">
+    <view class="title">请为本次服务打分</view>
+    <view class="stars">
+      <block wx:for="{{[1,2,3,4,5]}}" wx:key="*this">
+        <text class="star {{item <= rating ? 'on' : ''}}" data-value="{{item}}" bindtap="onRate">★</text>
+      </block>
+    </view>
+
+    <textarea class="input" placeholder="说说你的感受（可选）" bindinput="onInput" value="{{content}}" maxlength="300" />
+
+    <view class="images">
+      <button size="mini" type="default" bindtap="chooseImage">添加图片（可选）</button>
+      <block wx:for="{{images}}" wx:key="*this">
+        <image class="img" src="{{item}}" mode="aspectFill" />
+      </block>
+    </view>
+
+    <button class="submit" type="primary" bindtap="submit">提交评价</button>
+  </view>
+</view>
