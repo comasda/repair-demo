@@ -68,37 +68,38 @@
   </block>
 </view>
 
-  <!-- 师傅端：到场签到（仅已接单且是当前师傅本人） -->
-  <button wx:if="{{role==='technician' && order.status==='assigned' && order.technicianId===userId}}"
-          type="primary" bindtap="checkin">到场签到</button>
+<!-- 师傅端：到场签到（仅已接单且是当前师傅本人） -->
+<button wx:if="{{role==='technician' && order.status==='assigned' && order.technicianId===userId}}"
+        type="primary" bindtap="checkin">到场签到</button>
 </view>
 
-  <!-- 师傅端：发起完成（仅当已签到） -->
-  <view wx:if="{{role==='technician'}}" class="section">
-    <button
-      class="primary-btn"
-      bindtap="requestComplete"
-      wx:if="{{order.status==='checkedIn'}}"
-    >发起完成（待客户确认）</button>
-  
-    <button
-      class="primary-btn disabled"
-      wx:if="{{order.status!=='checkedIn' && order.status!=='done'}}"
-      disabled="true"
-    >需先到场签到后才能完成</button>
-  </view>
-  
-  <!-- 客户端：确认完成（仅当待确认） -->
-  <view wx:if="{{role==='customer' && order.status==='awaitingConfirm'}}" class="section">
-    <button class="primary-btn" bindtap="confirmComplete">确认完成</button>
-  </view>
-  
-  <!-- 状态提示（可选）：展示“待确认” -->
-  <view wx:if="{{order.status==='awaitingConfirm'}}" class="hint">
-    订单已由师傅发起完成，等待客户确认
-    <text class="sub">（确认后即可去评价）</text>
-  </view>
-<!-- 仅师傅可见；已完成订单时显示“查看用户评价” -->
+<!-- 师傅端：发起完成（仅当已签到） -->
 <view wx:if="{{role==='technician'}}" class="section">
+  <button
+    class="primary-btn"
+    bindtap="requestComplete"
+    wx:if="{{order.status==='checkedIn'}}"
+  >发起完成（待客户确认）</button>
+
+  <button
+    class="primary-btn disabled"
+    wx:if="{{order.status!=='checkedIn' && order.status!=='done'}}"
+    disabled="true"
+  >需先到场签到后才能完成</button>
+</view>
+
+<!-- 客户端：确认完成（仅当待确认） -->
+<view wx:if="{{role==='customer' && order.status==='awaitingConfirm'}}" class="section">
+  <button class="primary-btn" bindtap="confirmComplete">确认完成</button>
+</view>
+
+<!-- 状态提示（可选）：展示“待确认” -->
+<view wx:if="{{order.status==='awaitingConfirm'}}" class="hint">
+  订单已由师傅发起完成，等待客户确认
+  <text class="sub">（确认后即可去评价）</text>
+</view>
+
+<!-- 仅师傅 & 已完成 才显示“查看用户评价” -->
+<view wx:if="{{role==='technician' && order.status==='done'}}" class="section">
   <button class="primary-btn" bindtap="goTechViewReview">查看用户评价</button>
 </view>

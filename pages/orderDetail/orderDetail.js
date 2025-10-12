@@ -220,6 +220,11 @@ Page({
       wx.showToast({ title: '仅师傅可查看', icon: 'none' })
       return
     }
+    // 仅完成状态允许进入评价页
+    if (order.status !== 'done') {
+      wx.showToast({ title: '仅已完成的订单可查看评价', icon: 'none' })
+      return
+    }
     wx.navigateTo({ url: `/pages/technician/review/review?id=${order._id}` })
     }
 })
