@@ -1,25 +1,37 @@
-<view class="container">
-  <text class="title">我的工单</text>
-
-  <block wx:for="{{orders}}" wx:key="_id">
-    <view class="order-card" data-id="{{item._id}}" bindtap="goDetail">
-      <!-- 工单头部：状态 + 时间 -->
-      <view class="order-header">
-        <text class="status">{{item.statusText}}</text>
-        <text class="time">{{item.time}}</text>
-      </view>
-
-      <!-- 工单主体：设备、问题、师傅 -->
-      <view class="order-body">
-        <text>设备：{{item.device}}</text>
-        <text>问题：{{item.issue}}</text>
-        <text>师傅：{{item.technicianName || '未分配'}}</text>
-      </view>
+<!-- 顶部筛选 tabs -->
+<view class="tabs">
+  <block wx:for="{{tabs}}" wx:key="key">
+    <view
+      class="tab-item {{index === currentTab ? 'active' : ''}}"
+      data-index="{{index}}"
+      bindtap="onTabChange"
+    >
+      {{item.label}}
     </view>
   </block>
+</view>
 
-  <!-- 空数据提示 -->
-  <view wx:if="{{orders.length === 0}}" class="empty">
-    <text>暂无工单</text>
+<!-- 加载提示（可选） -->
+<view wx:if="{{loading}}" class="loading">加载中...</view>
+
+<block wx:for="{{orders}}" wx:key="_id">
+  <view class="order-card" data-id="{{item._id}}" bindtap="goDetail">
+    <!-- 工单头部：状态 + 时间 -->
+    <view class="order-header">
+      <text class="status">{{item.statusText}}</text>
+      <text class="time">{{item.time}}</text>
+    </view>
+
+    <!-- 工单主体：设备、问题、师傅 -->
+    <view class="order-body">
+      <text>设备：{{item.device}}</text>
+      <text>问题：{{item.issue}}</text>
+      <text>师傅：{{item.technicianName || '未分配'}}</text>
+    </view>
   </view>
+</block>
+
+<!-- 空态 -->
+<view wx:if="{{!loading && orders.length === 0}}" class="empty">
+  暂无该状态的工单
 </view>

@@ -6,32 +6,61 @@ const statusMap = {
   done: '已完成'
 }
 
+const tabs = [
+  { key: 'all', label: '全部', status: '' },
+  { key: 'pending', label: '待接单', status: 'pending' },
+  { key: 'assigned', label: '已接单', status: 'assigned' },
+  { key: 'done', label: '已完成', status: 'done' }
+]
+
 Page({
   data: {
-    orders: []
+    // 当前选中
+    tabs,
+    currentTab: 0,   // 0=全部, 1=待接单, 2=已接单, 3=已完成
+    // 订单列表
+    orders: [],
+    // 加载态
+    loading: true
   },
 
-  onShow() {
+  // 通用拉取函数：根据当前 tab 携带 status 请求
+  fetchOrders() {
     const user = wx.getStorageSync('currentUser')
     if (!user || user.role !== 'customer') {
       wx.showToast({ title: '请用客户账号登录', icon: 'none' })
       wx.reLaunch({ url: '/pages/auth/login/login' })
       return
     }
-
-    // 客户端用 customerId 查询
     const customerId = user.id || user._id
 
-    get(`/orders?customerId=${customerId}`).then(res => {
-      const mapped = res.map(o => ({
-        ...o,
-        statusText: statusMap[o.status] || o.status
-      }))
-      console.log('客户端我的工单数据:', mapped)
-      this.setData({ orders: mapped })
-    }).catch(err => {
-      wx.showToast({ title: '获取工单失败', icon: 'none' })
-    })
+    const tab = this.data.tabs[this.data.currentTab]
+    const statusQuery = tab.status ? `&status=${tab.status}` : ''   // ⭐ 有状态则拼上
+    this.setData({ loading: true })
+    get(`/orders?customerId=${customerId}${statusQuery}`)
+      .then(res => {
+        const mapped = (res || []).map(o => ({
+          ...o,
+          statusText: statusMap[o.status] || o.status
+        }))
+        this.setData({ orders: mapped, loading: false })
+      })
+      .catch(() => {
+        wx.showToast({ title: '获取工单失败', icon: 'none' })
+        this.setData({ loading: false })
+      })
+  },
+
+  // 生命周期：进入页面/返回显示时都按当前 tab 拉取
+  onShow() {
+    this.fetchOrders()
+  },
+
+  // 切换 tab
+  onTabChange(e) {
+    const index = Number(e.currentTarget.dataset.index)
+    if (index === this.data.currentTab) return
+    this.setData({ currentTab: index }, () => this.fetchOrders())
   },
 
   goDetail(e) {
