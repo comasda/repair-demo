@@ -19,7 +19,9 @@ Page({
   gomyOrders() {  wx.navigateTo({ url: '/pages/technician/myOrders/myOrders' }) },
   goIncome() { wx.showToast({ title: '跳转收益记录', icon: 'none' }) },
   goProfile() { wx.showToast({ title: '跳转我的资料', icon: 'none' }) },
-  goEvaluate() { wx.showToast({ title: '跳转工单评价', icon: 'none' }) },
+
+  goEvaluate() { wx.navigateTo({ url: '/pages/technician/reviewList/reviewList' }) },
+
   goComplaint() { wx.showToast({ title: '跳转投诉处理', icon: 'none' }) },
   goBills() { wx.showToast({ title: '跳转账务明细', icon: 'none' }) },
   goAbout() { wx.showToast({ title: '跳转关于我们', icon: 'none' }) }

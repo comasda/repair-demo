@@ -1,0 +1,26 @@
+<view class="container">
+  <block wx:if="{{hasReview}}">
+    <block wx:for="{{reviews}}" wx:key="index">
+      <view class="review-card">
+        <view class="header">
+          <text class="customer">{{item.customerName}}</text>
+          <text class="rating">⭐ {{item.rating}}</text>
+          <text class="time">{{item.time}}</text>
+        </view>
+        <view class="content">{{item.content}}</view>
+        <view class="imgs" wx:if="{{item.images.length}}">
+          <image
+            wx:for="{{item.images}}"
+            wx:key="idx"
+            mode="aspectFill"
+            src="{{item}}"
+            data-src="{{item}}"
+            bindtap="previewImg"
+          />
+        </view>
+      </view>
+    </block>
+  </block>
+
+  <view wx:else class="empty">暂无用户评价</view>
+</view>

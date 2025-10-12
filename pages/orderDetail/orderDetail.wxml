@@ -76,3 +76,8 @@
   <button wx:if="{{role==='technician' && order.status==='assigned' && order.technicianId===userId}}"
           type="primary" bindtap="markCompleted" style="margin-top: 16rpx;">标记完成</button>
 </view>
+
+<!-- 仅师傅可见；已完成订单时显示“查看用户评价” -->
+<view wx:if="{{role==='technician'}}" class="section">
+  <button class="primary-btn" bindtap="goTechViewReview">查看用户评价</button>
+</view>

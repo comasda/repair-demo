@@ -13,7 +13,9 @@
     "pages/technician/myOrders/myOrders",
     "pages/orderDetail/orderDetail",
     "pages/customer/review/review",
-    "pages/customer/evaluate/evaluate"
+    "pages/customer/evaluate/evaluate",
+    "pages/technician/review/review",
+    "pages/technician/reviewList/reviewList"
   ],
 
   "usingComponents": {

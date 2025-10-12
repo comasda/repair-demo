@@ -1,0 +1,12 @@
+.container { padding: 16rpx; background: #f6f7fb; min-height: 100vh; }
+.review-card {
+  background: #fff; margin-bottom: 20rpx; padding: 24rpx;
+  border-radius: 12rpx; box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
+}
+.header { display: flex; justify-content: space-between; color: #555; font-size: 26rpx; margin-bottom: 12rpx; }
+.customer { font-weight: 600; }
+.rating { color: #f7b500; }
+.time { color: #999; font-size: 22rpx; }
+.content { color: #333; margin-bottom: 12rpx; }
+.imgs image { width: 160rpx; height: 160rpx; margin-right: 8rpx; border-radius: 8rpx; }
+.empty { text-align: center; color: #999; margin-top: 200rpx; font-size: 30rpx; }

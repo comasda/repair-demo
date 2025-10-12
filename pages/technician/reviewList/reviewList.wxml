@@ -1,0 +1,26 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="loading">加载中…</view>
+
+  <block wx:elif="{{list.length}}">
+    <block wx:for="{{list}}" wx:key="_id">
+      <view class="card" bindtap="goReviewDetail" data-id="{{item._id}}">
+        <view class="row title">
+          <text class="device">{{item.device}}</text>
+          <text class="status">{{item.statusText}}</text>
+        </view>
+        <view class="row sub">{{item.issue}}</view>
+        <view class="row addr">{{item.address}}</view>
+        <view class="row meta">{{item.time}}</view>
+
+        <view class="review-hint" wx:if="{{item.hasReview}}">
+          <text>已收到用户评价</text>
+        </view>
+        <view class="review-hint empty" wx:else>
+          <text>尚无评价</text>
+        </view>
+      </view>
+    </block>
+  </block>
+
+  <view wx:else class="empty">暂无“已完成”的订单</view>
+</view>

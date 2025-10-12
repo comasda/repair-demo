@@ -188,5 +188,15 @@ Page({
     put(`/orders/${id}/status`, { status: 'done', note: '工单已完成' })
       .then(() => { wx.showToast({ title: '工单已完成' }); this.loadOrder(id) })
       .catch(() => wx.showToast({ title: '操作失败', icon: 'none' }))
-  }
+  },
+  // —— 师傅端：查看用户评价（仅在已完成时展示按钮）——
+   goTechViewReview() {
+    const { order, role } = this.data
+    if (!order || !order._id) return
+    if (role !== 'technician') {
+      wx.showToast({ title: '仅师傅可查看', icon: 'none' })
+      return
+    }
+    wx.navigateTo({ url: `/pages/technician/review/review?id=${order._id}` })
+    }
 })
