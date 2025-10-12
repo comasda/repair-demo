@@ -1,11 +1,12 @@
 const { get } = require('../../../utils/request')
 
-const statusMap = { pending: '待接单', assigned: '待签到', checkedIn: '已签到', done: '已完成' }
+const statusMap = { pending: '待接单', assigned: '待签到', checkedIn: '已签到', awaitingConfirm: '待确认', done: '已完成' }
 
 const tabs = [
   { key: 'all', label: '全部', status: '' },
   { key: 'assigned', label: '待签到', status: 'assigned' },
   { key: 'checkedIn', label: '已签到', status: 'checkedIn' },
+  { key: 'awaitingConfirm', label: '待确认', status: 'awaitingConfirm' },
   { key: 'done', label: '已完成', status: 'done' }
 ]
 

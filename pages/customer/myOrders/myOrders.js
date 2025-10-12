@@ -3,7 +3,8 @@ const { get } = require('../../../utils/request')
 const statusMap = {
   pending: '待接单',
   assigned: '已接单',
-  checkedIn: '已接单', 
+  checkedIn: '已接单',
+  awaitingConfirm: '待确认',
   done: '已完成'
 }
 
@@ -11,6 +12,7 @@ const tabs = [
   { key: 'all', label: '全部', status: '' },
   { key: 'pending', label: '待接单', status: 'pending' },
   { key: 'assigned', label: '已接单', status: 'assigned' },
+  { key: 'awaitingConfirm', label: '待确认', status: 'awaitingConfirm' },
   { key: 'done', label: '已完成', status: 'done' }
 ]
 
@@ -18,7 +20,7 @@ Page({
   data: {
     // 当前选中
     tabs,
-    currentTab: 0,   // 0=全部, 1=待接单, 2=已接单, 3=已完成
+    currentTab: 0,
     // 订单列表
     orders: [],
     // 加载态
