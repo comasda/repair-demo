@@ -4,6 +4,44 @@ import type { Order, OrderStatus } from './types'
 import AssignModal from './components/AssignModal'
 import OrderTable from './components/OrderTable'
 
+import { auth } from './store/auth'
+
+function LoginPage({ onLogin }: { onLogin: () => void }) {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    try {
+      const data = await api.adminLogin(username, password)
+      if (data.user.role !== 'admin') throw new Error('该账号不是管理员')
+      auth.setToken(data.accessToken)
+      auth.setUser(data.user)
+      onLogin()
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="login-page">
+      <form onSubmit={submit} className="login-box">
+        <h2>管理员登录</h2>
+        {error && <div className="error">{error}</div>}
+        <input value={username} onChange={e=>setUsername(e.target.value)} placeholder="用户名" />
+        <input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="密码" />
+        <button disabled={loading}>{loading ? '登录中...' : '登录'}</button>
+      </form>
+    </div>
+  )
+}
+
 const statuses: {key:''|OrderStatus, label:string}[] = [
   { key:'', label:'全部' },
   { key:'pending', label:'待接单' },
@@ -15,6 +53,11 @@ const statuses: {key:''|OrderStatus, label:string}[] = [
 ]
 
 export default function App(){
+  const [authed, setAuthed] = useState(auth.isAdminAuthed())
+
+  if (!authed) {
+    return <LoginPage onLogin={() => setAuthed(true)} />
+  }
   const [status, setStatus] = useState<''|OrderStatus>('')
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(false)
