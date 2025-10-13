@@ -1,4 +1,7 @@
 *.log
 .vscode
+package-lock.json
+node_modules/
+dist/
 !.gitignore
 !README.md
