@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000'
+const API_BASE = import.meta.env.VITE_API_BASE || '/api'
 const ADMIN_TOKEN = import.meta.env.VITE_ADMIN_TOKEN || ''
 
 async function http(path: string, options: RequestInit = {}) {
