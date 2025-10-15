@@ -120,7 +120,7 @@ Page({
 
     const { title, desc, phone, address, images, location, locationDesc } = this.data
 
-    post('/orders', {
+    post('/customer', {
       customer: user.username,   // 手机号 / 用户名
       customerId: user.id || user._id,
       device: title,
@@ -128,10 +128,10 @@ Page({
       phone,
       address,                   // 文本地址
       images,                    // 先存临时路径；后续可接上传接口
-      // 新增：地图坐标 + 选择位置的可读地址（后端稍后对接）
+      // 新增：地图坐标 + 选择位置的可读地址
       location,                  // { lat, lng }
       locationAddress: locationDesc
-    }).then(() => {
+    },{ loading: true }).then(() => {
       wx.showToast({
         title: '工单提交成功', icon: 'success', duration: 1000,
         success: () => setTimeout(() => wx.reLaunch({ url: '/pages/customer/home/home' }), 1000)
