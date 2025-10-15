@@ -11,6 +11,7 @@
       <text class="line">电话：{{order.phone || '未填写'}}</text>
       <text class="line">地址：{{order.address || '未填写'}}</text>
       <text class="line">下单时间：{{order.time}}</text>
+      <text class="line">师傅：{{order.technicianName}}</text>
     </view>
 
     <!-- 图片（如有） -->

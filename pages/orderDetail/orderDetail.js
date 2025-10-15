@@ -44,7 +44,7 @@ Page({
   },
 
   loadOrder(id) {
-    get(`/orders/${id}`).then(res => {
+    get(`/customer/${id}`, { loading: true }).then(res => {
       // 兼容两种写法：order.location = {lat,lng} 或 order.lat/order.lng
       const loc = res.location || {}
       res._lat = loc.lat != null ? loc.lat : res.lat
