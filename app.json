@@ -7,7 +7,6 @@
     "pages/customer/newOrder/newOrder",
     "pages/customer/myOrders/myOrders",
     "pages/technician/home/home",
-    "pages/admin/home/home",
     "pages/dashboard/dashboard",
     "pages/technician/pendingOrders/pendingOrders",
     "pages/technician/myOrders/myOrders",
