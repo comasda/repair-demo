@@ -26,13 +26,12 @@ Page({
       wx.showToast({ title: '手机号错误', icon: 'none' }); return
     }
     console.log('手机号原始值：', JSON.stringify(this.data.phone))
-    post('/users/login', {
-      username: phone,
-      password
-    }).then(res => {
-      wx.setStorageSync('currentUser', res.user)
-      wx.showToast({ title: '登录成功' })
-      this.jumpByRole(res.user.role)
+    post('/users/login', { username: phone, password },  { auth: false, loading: true })
+      .then(res => {
+        wx.setStorageSync('currentUser', res.user)
+        wx.setStorageSync('token', res.accessToken)   //保存 JWT
+        wx.showToast({ title: '登录成功' })
+        this.jumpByRole(res.user.role)
     }).catch(err => {
       wx.showToast({ title: err.message || '账号或密码错误', icon: 'none' })
     })

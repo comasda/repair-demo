@@ -44,12 +44,15 @@ Page({
     if (roleText === '师傅') role = 'technician'
 
     // 调用后端接口注册
-    post('/users/register', {
-      username: cleanPhone,   // 用手机号作为 username
-      password,
-      role
-    }).then(res => {
+    post('/users/register', { username: cleanPhone, password, role }).then(async (res) => {
       wx.setStorageSync('currentUser', res.user)
+      if (res.accessToken) {
+        wx.setStorageSync('token', res.accessToken)      // 注册即得 token
+      } else {
+        // 兼容后端未返回 token 的老版本：注册后自动登录一次
+        const loginRes = await post('/users/login', { username: cleanPhone, password })
+        wx.setStorageSync('token', loginRes.accessToken)
+      }
       wx.showToast({
         title: '注册成功',
         icon: 'success',
