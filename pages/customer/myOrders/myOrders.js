@@ -45,8 +45,8 @@ Page({
 
       if (tab.key === 'assigned') {
         const [a, c] = await Promise.all([
-          get(`/customer?customerId=${customerId}&status=assigned`, { loading: true }),
-          get(`/customer?customerId=${customerId}&status=checkedIn`, { loading: true })
+          get(`/customer?status=assigned`, { loading: true }),
+          get(`/customer?status=checkedIn`, { loading: true })
         ])
         // 合并（按 _id 去重）
         const map = new Map()
@@ -55,15 +55,15 @@ Page({
       } else if (tab.key === 'pending') {
       // ➜ 待接单 = pending + offered
       const [p, o] = await Promise.all([
-        get(`/customer?customerId=${customerId}&status=pending`, { loading: true }),
-        get(`/customer?customerId=${customerId}&status=offered`, { loading: true })
+        get(`/customer?status=pending`, { loading: true }),
+        get(`/customer?status=offered`, { loading: true })
       ])
       const map = new Map()
       ;[...(p||[]), ...(o||[])].forEach(x => map.set(x._id, x))
       list = Array.from(map.values())
       }else {
         const statusQuery = tab.status ? `&status=${tab.status}` : ''
-        list = await get(`/customer?customerId=${customerId}${statusQuery}`, { loading: true })
+        list = await get(`/customer?{statusQuery}`, { loading: true })
       }
 
       const mapped = (list || []).map(o => ({

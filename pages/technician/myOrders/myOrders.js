@@ -30,7 +30,7 @@ Page({
     const statusQuery = tab.status ? `&status=${tab.status}` : ''
     this.setData({ loading: true })
 
-    get(`/orders?technicianId=${technicianId}${statusQuery}`)
+    get(`/technicians/mine`)
       .then(res => {
         const mapped = (res || []).map(o => ({
           ...o,
