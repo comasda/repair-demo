@@ -1,6 +1,13 @@
 const { get } = require('../../../utils/request')
 
-const statusMap = { pending: '待接单', assigned: '待签到', checkedIn: '已签到', awaitingConfirm: '待确认', done: '已完成' }
+// 为师傅端补齐 offered；pending 在师傅端不可见
+const statusMap = {
+  offered: '待接单',
+  assigned: '待签到',
+  checkedIn: '已签到',
+  awaitingConfirm: '待确认',
+  done: '已完成'
+}
 
 const tabs = [
   { key: 'all', label: '全部', status: '' },
@@ -25,12 +32,12 @@ Page({
       wx.reLaunch({ url: '/pages/auth/login/login' })
       return
     }
-    const technicianId = user.id || user._id
+
     const tab = this.data.tabs[this.data.currentTab]
-    const statusQuery = tab.status ? `&status=${tab.status}` : ''
+    const url = tab.status ? `/technicians/mine?status=${tab.status}` : '/technicians/mine'
     this.setData({ loading: true })
 
-    get(`/technicians/mine`)
+    get(url)
       .then(res => {
         const mapped = (res || []).map(o => ({
           ...o,
