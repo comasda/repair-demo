@@ -40,7 +40,7 @@ Page({
     }
 
     // 这里仍然直接提交；若要上线存图，请先把 tmp 转成 URL 再提交
-    await post(`/orders/${orderId}/reviews`, {
+    await post(`/customer/${orderId}/reviews`, {
       customerId: user.id || user._id,
       customerName: user.username || user.nickname || '',
       rating,
@@ -49,6 +49,28 @@ Page({
     })
 
     wx.showToast({ title: this.data.mode === 'append' ? '追加成功' : '评价成功' })
+    this.refreshPrevPage()
     setTimeout(() => wx.navigateBack(), 800)
+  },
+
+  /** 🔁 通用刷新函数 **/
+  refreshPrevPage() {
+    try {
+      // ① eventChannel（优先）
+      const ec = this.getOpenerEventChannel?.()
+      if (ec && ec.emit) {
+        ec.emit('review:refresh', { need: true })
+        return
+      }
+      // ② 直接调用上一页的刷新函数
+      const pages = getCurrentPages()
+      const prev = pages[pages.length - 2]
+      if (prev) {
+        if (typeof prev.loadOrder === 'function') prev.loadOrder(prev.data.order?._id)
+        else if (typeof prev.fetchOrders === 'function') prev.fetchOrders()
+      }
+    } catch (e) {
+      console.error('refreshPrevPage fail', e)
+    }
   }
 })

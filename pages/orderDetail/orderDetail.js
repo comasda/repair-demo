@@ -70,13 +70,23 @@ Page({
   // —— 客户端：去评价 ——（未评价时显示）
   goReview() {
     const id = this.data.order._id
-    wx.navigateTo({ url: `/pages/customer/review/review?id=${id}&mode=first` })
+    wx.navigateTo({
+      url: `/pages/customer/review/review?id=${id}&mode=first`,
+      events: {
+        'review:refresh': () => this.loadOrder(id) // 收到事件后刷新详情
+      }
+    })
   },
 
   // —— 客户端：追加评价 ——（已评价时显示）
   goAppendReview() {
     const id = this.data.order._id
-    wx.navigateTo({ url: `/pages/customer/review/review?id=${id}&mode=append` })
+    wx.navigateTo({
+      url: `/pages/customer/review/review?id=${id}&mode=append`,
+      events: {
+        'review:refresh': () => this.loadOrder(id)
+      }
+    })
   },
 
   // —— 师傅端：到场签到（自动获取定位 & 距离判断）——

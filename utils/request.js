@@ -15,7 +15,7 @@ const request = (url, method = 'GET', data = {}, options = {}) => {
   //   header: {}          额外头
   //   auth: true|false    是否自动加 token（默认 true）
   //   loading: true|false 是否显示全局 loading（默认 false）
-  const { header = {}, auth = true, loading = false } = options
+  const { header = {}, auth = true, loading = true } = options
 
   const baseUrl = getApp().globalData.API || '' // 例如 "http://115.190.87.111/api"
   const finalHeaders = auth ? withAuthHeader(header) : header

@@ -15,15 +15,14 @@ Page({
       wx.reLaunch({ url: '/pages/auth/login/login' })
       return
     }
-    const customerId = user.id || user._id
 
     // 优先：后端支持 status=done
-    get(`/orders?customerId=${customerId}&status=done`).then(list => {
+    get(`/customer?&status=done`).then(list => {
       const mapped = (list || []).map(o => ({ ...o, statusText: statusMap[o.status] || o.status }))
       this.setData({ orders: mapped, loading: false })
     }).catch(() => {
       // 兜底：后端暂不支持时，前端过滤
-      get(`/orders?customerId=${customerId}`).then(list => {
+      get(`/customer`).then(list => {
         const filtered = (list || []).filter(o => o.status === 'done')
         const mapped = filtered.map(o => ({ ...o, statusText: statusMap[o.status] || o.status }))
         this.setData({ orders: mapped, loading: false })
