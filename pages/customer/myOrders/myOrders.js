@@ -36,7 +36,6 @@ Page({
       wx.reLaunch({ url: '/pages/auth/login/login' })
       return
     }
-    const customerId = user.id || user._id
 
     const tab = this.data.tabs[this.data.currentTab]
     this.setData({ loading: true })
@@ -53,17 +52,17 @@ Page({
         ;[...(a||[]), ...(c||[])].forEach(o => map.set(o._id, o))
         list = Array.from(map.values())
       } else if (tab.key === 'pending') {
-      // ➜ 待接单 = pending + offered
-      const [p, o] = await Promise.all([
-        get(`/customer?status=pending`, { loading: true }),
-        get(`/customer?status=offered`, { loading: true })
-      ])
-      const map = new Map()
-      ;[...(p||[]), ...(o||[])].forEach(x => map.set(x._id, x))
-      list = Array.from(map.values())
+        // ➜ 待接单 = pending + offered
+        const [p, o] = await Promise.all([
+          get(`/customer?status=pending`, { loading: true }),
+          get(`/customer?status=offered`, { loading: true })
+        ])
+        const map = new Map()
+        ;[...(p||[]), ...(o||[])].forEach(x => map.set(x._id, x))
+        list = Array.from(map.values())
       }else {
         const statusQuery = tab.status ? `&status=${tab.status}` : ''
-        list = await get(`/customer?{statusQuery}`, { loading: true })
+        list = await get(`/customer?status=${statusQuery}`, { loading: true })
       }
 
       const mapped = (list || []).map(o => ({
