@@ -175,7 +175,7 @@ Page({
 
   _postCheckin(orderId, lat, lng) {
     const { userId, userName } = this.data
-    post(`/orders/${orderId}/checkin`, {
+    post(`/technicians/${orderId}/checkin`, {
       lat, lng,
       technicianId: userId,
       technicianName: userName
@@ -199,7 +199,7 @@ Page({
     if (order.status !== 'checkedIn') {
       wx.showToast({ title: '需到场签到后才能发起完成', icon: 'none' }); return
     }
-    post(`/orders/${order._id}/complete-request`, { technicianId: userId })
+    post(`/technicians/${order._id}/complete-request`, { technicianId: userId })
       .then(() => { wx.showToast({ title: '已发起完成，等待客户确认' }); this.loadOrder(order._id) })
       .catch(err => wx.showToast({ title: err.message || '操作失败', icon: 'none' }))
   },
@@ -214,7 +214,7 @@ Page({
     if (order.status !== 'awaitingConfirm') {
       wx.showToast({ title: '当前状态不可确认', icon: 'none' }); return
     }
-    post(`/orders/${order._id}/complete-confirm`, { customerId: userId })
+    post(`/customer/${order._id}/complete-confirm`, { customerId: userId })
       .then(() => {
         wx.showToast({ title: '订单已完成' })
         // 可选：完成后引导去评价

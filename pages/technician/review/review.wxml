@@ -1,26 +1,79 @@
-<view class="container">
-  <block wx:if="{{hasReview}}">
-    <block wx:for="{{reviews}}" wx:key="index">
-      <view class="review-card">
-        <view class="header">
-          <text class="customer">{{item.customerName}}</text>
-          <text class="rating">⭐ {{item.rating}}</text>
-          <text class="time">{{item.time}}</text>
-        </view>
-        <view class="content">{{item.content}}</view>
-        <view class="imgs" wx:if="{{item.images.length}}">
-          <image
-            wx:for="{{item.images}}"
-            wx:key="idx"
-            mode="aspectFill"
-            src="{{item}}"
-            data-src="{{item}}"
-            bindtap="previewImg"
-          />
-        </view>
+<view class="page">
+  <!-- 顶部统计（有数据时显示） -->
+  <view wx:if="{{summary}}" class="summary">
+    <view class="summary-left">
+      <text class="summary-title">共 {{summary.count}} 条评价</text>
+      <view class="rate-chip">
+        <text class="star">★</text>
+        <text class="rate">{{summary.avg}}</text>
       </view>
-    </block>
+    </view>
+    <text class="summary-time">{{summary.updatedAt}}</text>
+  </view>
+
+  <!-- 评价卡片列表 -->
+  <block wx:for="{{reviews}}" wx:key="id">
+    <view class="card">
+      <view class="card-head">
+        <!-- 左侧：头像徽章（客户名首字或“订”） -->
+        <view class="avatar-badge">
+          <text class="badge-text">{{(item.customerName && item.customerName[0]) || '订'}}</text>
+        </view>
+
+        <view class="title-wrap">
+          <view class="title-row">
+            <text class="title">{{item.customerName || '订单'}}</text>
+            <!-- 评分胶囊：按分值变色 -->
+            <view class="pill pill-rate-{{item.rating || 0}}">
+              <text class="pill-star">★</text>
+              <text class="pill-score">{{item.rating || 0}}</text>
+            </view>
+          </view>
+          <view class="sub-row">
+            <text class="order-no">订单号：{{item.orderNo || item.phone || '--'}}</text>
+          </view>
+        </view>
+
+        <!-- 右侧：时间 -->
+        <text class="time">{{item.time}}</text>
+      </view>
+
+      <!-- 星级行（纯展示） -->
+      <view class="stars-row">
+        <text class="star" wx:for="{{[1,2,3,4,5]}}" wx:key="*this"
+              style="opacity: {{index < (item.rating || 0) ? 1 : 0.22}}">★</text>
+      </view>
+
+      <!-- 内容（灰紫色引用块） -->
+      <view wx:if="{{item.content}}" class="content-quote">
+        {{item.content}}
+      </view>
+
+      <!-- 图片九宫格 -->
+      <view wx:if="{{item.images && item.images.length}}" class="images">
+        <image wx:for="{{item.images}}"
+               wx:for-item="img"
+               wx:key="*this"
+               class="img"
+               mode="aspectFill"
+               src="{{img}}"
+               bindtap="previewImage"
+               data-current="{{img}}"
+               data-list="{{item.images}}" />
+      </view>
+
+      <!-- 卡片脚注 -->
+      <view class="card-foot">
+        <text class="foot-left">服务完成</text>
+        <view class="dot"></view>
+        <text class="foot-right">{{item.time}}</text>
+      </view>
+    </view>
   </block>
 
-  <view wx:else class="empty">暂无用户评价</view>
+  <!-- 空态 -->
+  <view wx:if="{{!reviews || !reviews.length}}" class="empty">
+    <view class="empty-circle">★</view>
+    <text class="empty-text">还没有评价</text>
+  </view>
 </view>

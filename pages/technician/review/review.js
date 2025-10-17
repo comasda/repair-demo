@@ -21,7 +21,7 @@ Page({
   },
 
   loadReviews(orderId, technicianId) {
-    get(`/orders/${orderId}/review`, { technicianId })
+    get(`/technicians/${orderId}/review`)
       .then(res => {
         const list = Array.isArray(res.reviews) ? res.reviews : []
         this.setData({ reviews: list, hasReview: list.length > 0 })
@@ -31,7 +31,7 @@ Page({
       })
   },
 
-  previewImg(e) {
+  previewImage(e) {
     const current = e.currentTarget.dataset.src
     const urls = (this.data.reviews || [])
       .flatMap(r => r.images || [])

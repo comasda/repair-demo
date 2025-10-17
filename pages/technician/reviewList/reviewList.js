@@ -19,7 +19,7 @@ Page({
     }
     this.setData({ loading: true })
     try {
-      const ret = await get('/orders', {
+      const ret = await get('/technicians/mine', {
         technicianId: user.id || user._id,
         status: 'done' // 只拿已完成订单
       })

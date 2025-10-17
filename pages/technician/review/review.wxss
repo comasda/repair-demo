@@ -1,12 +1,124 @@
-.container { padding: 16rpx; background: #f6f7fb; min-height: 100vh; }
-.review-card {
-  background: #fff; margin-bottom: 20rpx; padding: 24rpx;
-  border-radius: 12rpx; box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
+:root{
+  --bg:#f6f7fb;
+  --card:#ffffff;
+  --text:#2b2f36;
+  --muted:#8a94a6;
+  --primary:#635bff;
+  --star:#ffb020;
+  --shadow:0 10rpx 26rpx rgba(22,28,45,.06);
+  --radius:20rpx;
 }
-.header { display: flex; justify-content: space-between; color: #555; font-size: 26rpx; margin-bottom: 12rpx; }
-.customer { font-weight: 600; }
-.rating { color: #f7b500; }
-.time { color: #999; font-size: 22rpx; }
-.content { color: #333; margin-bottom: 12rpx; }
-.imgs image { width: 160rpx; height: 160rpx; margin-right: 8rpx; border-radius: 8rpx; }
-.empty { text-align: center; color: #999; margin-top: 200rpx; font-size: 30rpx; }
+
+.page{
+  min-height:100vh;
+  background:var(--bg);
+  padding:22rpx 24rpx 48rpx;
+  box-sizing:border-box;
+}
+
+/* 顶部统计 */
+.summary{
+  display:flex; justify-content:space-between; align-items:center;
+  background:linear-gradient(135deg,#f0f2ff 0%,#ffffff 100%);
+  border-radius:24rpx; box-shadow:var(--shadow);
+  padding:22rpx; margin-bottom:22rpx;
+}
+.summary-left{display:flex; align-items:center; gap:16rpx;}
+.summary-title{color:var(--text); font-weight:700;}
+.rate-chip{
+  display:flex; align-items:center; gap:8rpx;
+  padding:6rpx 14rpx; border-radius:999rpx;
+  background: linear-gradient(135deg,#dbeafe,#ecfeff);
+  border:2rpx solid #93c5fd;
+}
+.rate-chip .star{ color:#f59e0b; }
+.rate-chip .rate{ color:#0f766e; font-weight:700; }
+.summary-time{color:var(--muted); font-size:24rpx}
+
+/* 卡片 */
+.card{
+  position:relative; overflow:hidden;
+  background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:22rpx; margin-bottom:20rpx;
+}
+.card::before{
+  content:""; position:absolute; left:0; top:0; right:0; height:4rpx;
+  background: linear-gradient(90deg, #7c3aed, #22d3ee, #f59e0b);
+}
+
+/* 头部 */
+.card-head{display:flex; align-items:center; gap:16rpx;}
+.avatar-badge{
+  width:64rpx; height:64rpx; border-radius:16rpx; background:#eef0ff;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--primary); font-weight:800;
+  box-shadow:inset 0 0 0 2rpx rgba(99,91,255,.15);
+}
+.badge-text{font-size:28rpx; transform:translateY(2rpx);}
+.title-wrap{flex:1; overflow:hidden;}
+.title-row{display:flex; align-items:center; gap:12rpx;}
+.title{
+  color:var(--text); font-weight:700; font-size:30rpx;
+  max-width:440rpx; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.pill{
+  display:flex; align-items:center; gap:6rpx;
+  padding:6rpx 14rpx; border-radius:999rpx; font-weight:700; font-size:24rpx;
+}
+.pill-star{ margin-right:6rpx; }
+.pill-score{ letter-spacing:1rpx; }
+
+/* 评分胶囊分级配色 */
+.pill-rate-5{ background:#ecfdf5; border:2rpx solid #10b98133; color:#047857; }
+.pill-rate-4{ background:#fefce8; border:2rpx solid #f59e0b33; color:#8a5a00; }
+.pill-rate-3{ background:#fff7ed; border:2rpx solid #fb923c33; color:#9a3412; }
+.pill-rate-2{ background:#fff1f2; border:2rpx solid #f43f5e33; color:#9f1239; }
+.pill-rate-1{ background:#fef2f2; border:2rpx solid #ef444433; color:#991b1b; }
+
+.sub-row{margin-top:4rpx;}
+.order-no{color:var(--muted); font-size:24rpx;}
+.time{color:#9aa3b2; font-size:24rpx;}
+
+/* 星级行（渐变星星） */
+.stars-row{ margin:18rpx 0 8rpx; display:flex; gap:6rpx; }
+.star{
+  background: linear-gradient(180deg,#ffb020,#ff8c00);
+  -webkit-background-clip:text;
+  color: transparent;
+  font-size:26rpx; line-height:1;
+}
+
+/* 内容引文块（灰紫调） */
+.content-quote{
+  background:#f5f3ff; border:2rpx solid #e9e7ff; color:#3b3b55;
+  padding:18rpx; border-radius:16rpx; line-height:1.7; margin-top:8rpx;
+  white-space:pre-wrap;
+}
+
+/* 图片九宫格 */
+.images{
+  margin-top:14rpx;
+  display:grid; grid-template-columns:repeat(3,1fr); grid-gap:12rpx;
+}
+.img{
+  width:100%; height:220rpx; border-radius:14rpx; background:#eef1f5;
+  transition: transform .15s ease;
+}
+.img:active{ transform: scale(.98); }
+
+/* 脚注 */
+.card-foot{
+  margin-top:16rpx; padding-top:14rpx; border-top:2rpx dashed #edf0f5;
+  display:flex; align-items:center; gap:10rpx; color:var(--muted); font-size:24rpx;
+}
+.dot{width:8rpx; height:8rpx; background:#d5dbe6; border-radius:999rpx}
+
+/* 空态 */
+.empty{padding:160rpx 0 80rpx; text-align:center;}
+.empty-circle{
+  width:160rpx; height:160rpx; margin:0 auto 16rpx;
+  border-radius:999rpx; background:#fff7e6; color:#ffb020;
+  display:flex; align-items:center; justify-content:center;
+  font-size:64rpx; box-shadow:var(--shadow);
+}
+.empty-text{color:var(--muted); font-size:28rpx}
