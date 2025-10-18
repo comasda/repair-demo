@@ -34,5 +34,6 @@ export interface Order {
 
 export interface TechnicianUser {
   _id: string;
-  username: string; // 从 User.js 返回
+  name: string;   // 身份证姓名
+  phone: string;
 }

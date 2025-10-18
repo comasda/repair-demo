@@ -37,3 +37,8 @@ export async function fetchTechnicians(q?: string): Promise<TechnicianUser[]> {
   if ('data' in res && Array.isArray(res.data)) return res.data;
   return [];
 }
+
+export async function fetchApprovedTechnicians(keyword = '') {
+  const res = await http.get('/technicians/approved', { params: { q: keyword } });
+  return res.data?.list || [];
+}

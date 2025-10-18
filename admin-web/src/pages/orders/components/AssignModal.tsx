@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { fetchTechnicians } from '../services/orderApi';
+import { fetchApprovedTechnicians } from '../services/orderApi';
 import type { TechnicianUser } from '../types';
 
 interface Props {
@@ -19,7 +19,9 @@ export default function AssignModal({ visible, onOk, onCancel }: Props) {
   const filtered = useMemo(() => {
     if (!q.trim()) return technicians;
     const kw = q.trim();
-    return technicians.filter(t => t.username.includes(kw));
+    return technicians.filter(
+        t => (t.name || '').includes(kw) || t.phone.includes(kw)
+    );
   }, [technicians, q]);
 
   useEffect(() => {
@@ -27,7 +29,7 @@ export default function AssignModal({ visible, onOk, onCancel }: Props) {
     (async () => {
       setLoading(true);
       try {
-        const list = await fetchTechnicians(); // 若要后端搜索：传入 q
+        const list = await fetchApprovedTechnicians(); // 若要后端搜索：传入 q
         setTechnicians(Array.isArray(list) ? list : []);
       } catch (e) {
         console.error(e);
@@ -84,17 +86,17 @@ export default function AssignModal({ visible, onOk, onCancel }: Props) {
                 value={selectedId}
                 onChange={(e) => {
                   const id = e.target.value;
-                  const name = filtered.find(t => t._id === id)?.username || '';
+                  const name = filtered.find(t => t._id === id)?.name || '';
                   setSelectedId(id);
                   setSelectedName(name);
                 }}
               >
                 <option value="">请选择技师</option>
-                {filtered.map(t => (
-                  <option key={t._id} value={t._id}>
-                    {t.username}
-                  </option>
-                ))}
+                  {filtered.map(t => (
+                    <option key={t._id} value={t._id}>
+                      {t.name ? `${t.name}（${t.phone}）` : t.phone}
+                    </option>
+                  ))}
               </select>
             </div>
           </>

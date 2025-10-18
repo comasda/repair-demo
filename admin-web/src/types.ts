@@ -13,4 +13,4 @@ export interface Order {
   statusText?: string
   time?: string
 }
-export interface Technician { id: string; name: string }
+
