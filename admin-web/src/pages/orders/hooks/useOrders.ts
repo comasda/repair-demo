@@ -27,33 +27,44 @@ export function useOrders() {
     load();
   }, [load]);
 
-async function handleAssign(orderId: string, technicianId: string, technicianName: string) {
-  setAssigningId(orderId);
-  try {
-    const updated = await assignOrder(orderId, technicianId, technicianName);
-    setOrders(prev => {
-      if (!Array.isArray(prev)) return prev ?? [];
-      return prev.map(o => {
-        // 如果后端返回的对象结构不完整（没有 _id），做“就地补丁”，避免渲染崩溃
-        if (o._id !== orderId) return o;
-        if (!updated || typeof updated !== 'object') {
-          return { ...o, technicianId, technicianName };
-        }
-        if (!('_id' in updated) || !updated._id) {
-          return { ...o, ...updated, technicianId, technicianName };
-        }
-        // 正常情况：用后端返回整条记录覆盖
-        return { ...o, ...updated };
+  async function handleAssign(orderId: string, technicianId: string, technicianName: string) {
+    setAssigningId(orderId);
+    try {
+      const updated = await assignOrder(orderId, technicianId, technicianName);
+
+      // ✅ 1) 本地即时更新：如果当前筛选是 pending，而返回状态不是 pending，就把该条从列表移除
+      setOrders(prev => {
+        if (!Array.isArray(prev)) return prev ?? [];
+        const next = (() => {
+          if (updated && typeof updated === 'object') {
+            const newStatus = (updated as any).status;
+            if (status === 'pending' && newStatus && newStatus !== 'pending') {
+              return prev.filter(o => o._id !== orderId);
+            }
+            // 常规：就地替换为后端返回
+            return prev.map(o => (o._id === orderId ? { ...o, ...updated } : o));
+          }
+          // 兜底：后端没回完整对象，也别让 UI 崩 —— 最少把技师信息打补丁
+          return prev.map(o =>
+            o._id === orderId ? { ...o, technicianId, technicianName } : o
+          );
+        })();
+        return next;
       });
-    });
-    alert('指派成功');
-  } catch (e) {
-    console.error(e);
-    alert(`指派失败：${(e as Error).message}`);
-  } finally {
-    setAssigningId(null);
+
+      // ✅ 2) 静默刷新：再拉一次，保证与后端完全一致（避免并发/其它字段没更新到）
+      // 不阻塞 UI；如果你想等它完成再提示，把 await 去掉即可
+      void load();
+
+      // ✅ 3) 轻提示
+      alert('指派成功');
+    } catch (e) {
+      console.error(e);
+      alert(`指派失败：${(e as Error).message}`);
+    } finally {
+      setAssigningId(null);
+    }
   }
-}
 
   return {
     orders,
