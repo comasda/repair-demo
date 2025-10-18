@@ -1,34 +1,101 @@
-.container {
-  padding: 40rpx;
+/* ===== 注册页基础布局 ===== */
+.page {
+  padding: 32rpx;
+  background: #f7f8fa;
+  min-height: 100vh;
+  box-sizing: border-box;
 }
-.title {
-  font-size: 36rpx;
-  font-weight: bold;
-  margin-bottom: 40rpx;
-  text-align: center;
+
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.05);
+  padding: 24rpx 28rpx;
 }
-.input {
-  width: 100%;
-  margin-bottom: 30rpx;
-  padding: 20rpx;
-  border: 2rpx solid #d1d5db;
+
+/* 每一行表单 */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid #f1f2f5;
+}
+.row:last-child {
+  border-bottom: none;
+}
+
+/* 左侧 label */
+.row text {
+  width: 160rpx;
+  flex: 0 0 160rpx;
+  color: #444;
+  font-size: 28rpx;
+}
+
+/* 输入框与选择器 */
+.row input {
+  flex: 1;
+  height: 72rpx;
+  line-height: 72rpx;
+  padding: 0 20rpx;
+  background: #f7f7f9;
   border-radius: 12rpx;
-  font-size: 30rpx;
-  background-color: #fff;
+  font-size: 28rpx;
+  color: #111;
 }
+
 .picker {
-  width: 100%;
-  padding: 20rpx;
-  border: 2rpx solid #d1d5db;
+  flex: 1;
+  height: 72rpx;
+  line-height: 72rpx;
+  padding: 0 20rpx;
+  background: #f7f7f9;
   border-radius: 12rpx;
-  margin-bottom: 30rpx;
-  font-size: 30rpx;
-  color: #374151;
+  font-size: 28rpx;
+  color: #111;
 }
-.btn-primary {
-  background: linear-gradient(90deg, #6366f1, #4f46e5);
-  color: white;
-  font-size: 32rpx;
-  padding: 20rpx;
-  border-radius: 50rpx;
+
+/* 验证码行：按钮靠右 */
+.row button[size="mini"] {
+  margin-left: auto;
+}
+
+/* 获取验证码按钮样式（可与 disabled 结合） */
+.btn-code {
+  height: 64rpx;
+  line-height: 64rpx;
+  padding: 0 24rpx;
+  border-radius: 12rpx;
+  background: #111827;
+  color: #fff;
+  font-size: 26rpx;
+  border: none;
+}
+.btn-code.disabled {
+  background: #c7c9cf !important;
+  color: #fff !important;
+}
+
+/* 提交按钮 */
+button[type="primary"] {
+  margin-top: 28rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  font-size: 30rpx;
+  border-radius: 16rpx;
+  background: #111827;
+}
+
+/* 轻量提示/分组标题（可选） */
+.section-title {
+  margin: 28rpx 0 8rpx;
+  padding-left: 8rpx;
+  color: #666;
+  font-size: 24rpx;
+}
+
+/* 容错：小屏留白 */
+.safe-bottom {
+  height: 40rpx;
 }
