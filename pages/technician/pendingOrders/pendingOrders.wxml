@@ -18,6 +18,7 @@
       <!-- 操作按钮 -->
       <view class="order-actions">
         <button type="primary" size="mini" data-id="{{item._id}}" bindtap="acceptOrder">接单</button>
+        <button type="default" size="mini" data-id="{{item._id}}" bindtap="declineOrder">拒绝</button>
         <button type="default" size="mini" data-id="{{item._id}}" bindtap="goDetail">详情</button>
       </view>
     </view>
