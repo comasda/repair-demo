@@ -1,6 +1,13 @@
 import http from '@/services/http'; // axios 实例封装
 import { Order, TechnicianUser } from '../types';
 
+// 导出参数类型定义
+export type ExportParams = {
+  status?: string;
+  from?: string;
+  to?: string;
+};
+
 // 获取订单列表
 export async function fetchOrders(status?: string): Promise<Order[]> {
   const url = `/admin/orders${status ? `?status=${encodeURIComponent(status)}` : ''}`;
@@ -41,4 +48,36 @@ export async function fetchTechnicians(q?: string): Promise<TechnicianUser[]> {
 export async function fetchApprovedTechnicians(keyword = '') {
   const res = await http.get('/technicians/approved', { params: { q: keyword } });
   return res.data?.list || [];
+}
+
+// 导出订单功能函数
+export async function exportOrders(params?: ExportParams) {
+  const res = await http.get('/admin/orders/export', {
+    params,
+    responseType: 'blob',
+  });
+
+  // 从响应头提取文件名
+  const cd = (res.headers as any)['content-disposition'] as string | undefined;
+  let filename = `订单导出_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  if (cd) {
+    const m = cd.match(/filename\*?=(?:UTF-8'')?("?)([^";]+)\1/i);
+    if (m && m[2]) filename = decodeURIComponent(m[2]);
+  }
+
+  const blob = new Blob([res.data], {
+    type:
+      (res.headers as any)['content-type'] ||
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+
+  // 创建下载链接并触发下载
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }

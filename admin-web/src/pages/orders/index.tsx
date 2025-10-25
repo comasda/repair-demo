@@ -3,11 +3,13 @@ import { useOrders } from './hooks/useOrders';
 import OrdersTable from './components/OrdersTable';
 import AssignModal from './components/AssignModal';
 import type { Order } from './types';
+import { exportOrders } from './services/orderApi';
 
 export default function OrdersPage() {
   const { orders, loading, status, setStatus, load, handleAssign, assigningId } = useOrders();
   const [modalVisible, setModalVisible] = useState(false);
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   // ✅ 登录检查：若无 token，提示并跳回登录页
   useEffect(() => {
@@ -26,6 +28,16 @@ export default function OrdersPage() {
     if (!currentOrder) return;
     await handleAssign(currentOrder._id, technicianId, technicianName);
     setModalVisible(false);
+  }
+
+  // 导出逻辑函数
+  async function onExport() {
+    try {
+      setExporting(true);
+      await exportOrders({ status }); // 可传入状态或日期筛选
+    } finally {
+      setExporting(false);
+    }
   }
 
   return (
@@ -52,6 +64,21 @@ export default function OrdersPage() {
         </label>
         <button onClick={load} disabled={loading} style={{ padding: '6px 12px' }}>
           {loading ? '刷新中...' : '刷新'}
+        </button>
+
+        {/* ✅ 新增：导出按钮 */}
+        <button
+          onClick={onExport}
+          disabled={exporting}
+          style={{
+            padding: '6px 12px',
+            background: '#16a34a',
+            color: '#fff',
+            border: 0,
+            borderRadius: 6,
+          }}
+        >
+          {exporting ? '导出中…' : '导出 Excel'}
         </button>
       </div>
 
