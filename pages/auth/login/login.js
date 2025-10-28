@@ -6,7 +6,8 @@ Page({
     phone: '',
     password: '',
     code: '',
-    mode: 'password' // password 或 code
+    mode: 'password', // password 或 code
+    passwordVisible: false,
   },
 
   onPhoneInput(e) { this.setData({ phone: e.detail.value }) },
@@ -17,6 +18,7 @@ Page({
     this.setData({ mode: this.data.mode === 'password' ? 'code' : 'password' })
   },
 
+  togglePasswordVisible() { this.setData({ passwordVisible: !this.data.passwordVisible }) },
   // 密码登录
   loginWithPassword() {
     const { phone, password } = this.data

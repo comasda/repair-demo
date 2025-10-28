@@ -2,7 +2,7 @@
   "libVersion": "3.10.1",
   "projectname": "repair-demo",
   "setting": {
-    "urlCheck": false,
+    "urlCheck": true,
     "coverView": true,
     "lazyloadPlaceholderEnable": false,
     "skylineRenderEnable": false,

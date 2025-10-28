@@ -8,7 +8,8 @@ App({
   },
 
   // globalData:{ API: 'https://api.anyixiu1.com/api'},
-  globalData:{ API: 'http://115.190.87.111:8080/api'},
+  // globalData:{ API: 'http://115.190.87.111:8080/api'},
+  globalData:{ API: 'https://www.lihewasher.com/api'},
   checkLogin: function() {
     const user = wx.getStorageSync('currentUser')
     if (!user) {

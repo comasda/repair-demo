@@ -3,8 +3,33 @@
   <view class="title">登录</view>
 
   <view wx:if="{{mode==='password'}}" class="form-box">
-    <input type="text" placeholder="请输入手机号" maxlength="11" bindinput="onPhoneInput" class="input"/>
-    <input type="password" placeholder="请输入密码" bindinput="onPwdInput" class="input"/>
+    <!-- 手机号输入（加外框） -->
+    <view class="input-box">
+      <input
+        type="number"
+        placeholder="请输入手机号"
+        class="login-input"
+        bindinput="onPhoneInput"
+        maxlength="11"
+      />
+    </view>
+    <!-- 密码输入（加外框 + 小眼睛切换） -->
+    <view class="input-box has-icon">
+      <!-- 当 passwordVisible=false 时，password=true => 密文；反之明文 -->
+      <input
+        type="text"
+        password="{{!passwordVisible}}"
+        placeholder="请输入密码"
+        class="login-input"
+        bindinput="onPwdInput"
+      />
+      <image
+        class="eye-icon"
+        src="{{passwordVisible ? '/assets/eye-open.png' : '/assets/eye-closed.png'}}"
+        mode="aspectFit"
+        bindtap="togglePasswordVisible"
+      />
+    </view>
     <button class="btn-primary" bindtap="loginWithPassword">密码登录</button>
   </view>
 
