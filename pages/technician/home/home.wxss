@@ -30,44 +30,49 @@
   opacity: 0.9;
 }
 
-/* 功能入口卡片 */
-.grid-card {
-  display: flex;
-  flex-wrap: wrap;
-  background: white;
-  border-radius: 20rpx;
-  box-shadow: 0 6rpx 12rpx rgba(0,0,0,0.08);
-  padding: 20rpx 0;
-}
-.grid-item {
-  width: 25%;
-  text-align: center;
-  margin: 30rpx 0;
-}
-.icon-box {
-  width: 100rpx;
-  height: 100rpx;
-  border-radius: 50%;
-  margin: 0 auto 15rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.icon {
-  width: 60rpx;
-  height: 60rpx;
-}
-.label {
-  font-size: 26rpx;
-  color: #374151;
+
+.card{
+  padding: 24rpx;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.06);
 }
 
-/* 彩色背景 */
-.bg-blue { background: #3b82f6; }
-.bg-orange { background: #f59e0b; }
-.bg-purple { background: #8b5cf6; }
-.bg-pink { background: #ec4899; }
-.bg-gray { background: #9ca3af; }
-.bg-red { background: #ef4444; }
-.bg-green { background: #10b981; }
-.bg-sky { background: #0ea5e9; }
+/* 图标底框专用：细描边 + 适当内边距 */
+.menu-wrapper{
+  padding-top: 16rpx;
+  padding-bottom: 16rpx;
+  border: 1rpx solid #E5E7EB;   /* 灰色细描边 */
+  box-sizing: border-box;
+}
+
+/* 功能入口卡片 */
+.grid-card{
+  display: flex;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+}
+.grid-item{
+  width: 25%;
+  padding: 20rpx 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.icon{
+  width: 96rpx;
+  height: 96rpx;
+  display: block;
+}
+.label{
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #6B7280; /* 类似注册页灰度 */
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* 点击反馈（与注册页一致的轻压态） */
+.item:active{ opacity: 0.8; }

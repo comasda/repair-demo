@@ -15,41 +15,42 @@
       <text class="stat-label">冻结金额</text>
     </view>
   </view>
-
+<view class="menu-wrapper card">
   <!-- 功能入口 -->
-  <view class="grid-card">
+  <view class="grid">
     <view class="grid-item" bindtap="goNewOrder">
-      <view class="icon-box bg-blue"><image src="/assets/icons/add.png" class="icon"/></view>
+      <image class="icon" mode="aspectFit" src="/assets/icons/new_order.png"></image>
       <text class="label">新建工单</text>
     </view>
     <view class="grid-item" bindtap="goRecharge">
-      <view class="icon-box bg-orange"><image src="/assets/icons/recharge.png" class="icon"/></view>
+      <image class="icon" mode="aspectFit" src="/assets/icons/recharge.png"></image>
       <text class="label">账户充值</text>
     </view>
     <view class="grid-item" bindtap="goRecords">
-      <view class="icon-box bg-purple"><image src="/assets/icons/records.png" class="icon"/></view>
+      <image class="icon" mode="aspectFit" src="/assets/icons/my_orders.png"></image>
       <text class="label">我的工单</text>
     </view>
     <view class="grid-item" bindtap="goEvaluate">
-      <view class="icon-box bg-pink"><image src="/assets/icons/evaluate.png" class="icon"/></view>
+      <image class="icon" mode="aspectFit" src="/assets/icons/evaluate.png"></image>
       <text class="label">工单评价</text>
     </view>
     <view class="grid-item" bindtap="goProfile">
-      <view class="icon-box bg-gray"><image src="/assets/icons/account.png" class="icon"/></view>
+      <image class="icon" mode="aspectFit" src="/assets/icons/my_account.png"></image>
       <text class="label">我的账户</text>
     </view>
     <view class="grid-item" bindtap="goComplaint">
-      <view class="icon-box bg-red"><image src="/assets/icons/complaint.png" class="icon"/></view>
+      <image class="icon" mode="aspectFit" src="/assets/icons/feedback.png"></image>
       <text class="label">投诉建议</text>
     </view>
     <view class="grid-item" bindtap="goBills">
-      <view class="icon-box bg-green"><image src="/assets/icons/bills.png" class="icon"/></view>
+      <image class="icon" mode="aspectFit" src="/assets/icons/bill_detail.png"></image>
       <text class="label">账务明细</text>
     </view>
     <view class="grid-item" bindtap="goAbout">
-      <view class="icon-box bg-sky"><image src="/assets/icons/about.png" class="icon"/></view>
+      <image class="icon" mode="aspectFit" src="/assets/icons/about_us.png"></image>
       <text class="label">关于我们</text>
     </view>
   </view>
+</view>
 
 </view>
