@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { auth } from './store/auth';
-import OrdersPage from './pages/orders'; // 引入我们刚写好的 orders 模块
+import OrdersPage from './pages/orders';
+import TechnicianReviewPage from './pages/technicians';
 
 // 简单判断是否已登录（存在 token 即视为已登录）
 const isAuthed = () => Boolean(localStorage.getItem('token'));
@@ -61,39 +62,59 @@ function LoginPage({ onLogin }: { onLogin: () => void }) {
 }
 
 export default function App() {
-  // 用本地 token 作为是否登录的单一事实来源
   const [authed, setAuthed] = useState(isAuthed());
+  const [tab, setTab] = useState<'orders' | 'techs'>('orders'); // 👈 当前页
 
-  // 监听本地 token 变化（跨标签页同步 & 清缓存后自动回到登录页）
   useEffect(() => {
-    const sync = () => setAuthed(isAuthed());
-    window.addEventListener('storage', sync);
-    return () => window.removeEventListener('storage', sync);
+    const token = localStorage.getItem('token');
+    setAuthed(Boolean(token));
   }, []);
 
-  // 进入应用时再校验一次（防止首次渲染时状态不同步）
-  useEffect(() => {
-    setAuthed(isAuthed());
-  }, []);
-  if (!authed) {
-    return <LoginPage onLogin={() => setAuthed(true)} />;
-  }
+  if (!authed) return <LoginPage onLogin={() => setAuthed(true)} />;
 
-  // 已登录：渲染后台页面；可选提供一个登出按钮
   return (
     <>
-      {/* 轻量登出（可删） */}
-      <div style={{ padding: 8, textAlign: 'right' }}>
-        <button
-          onClick={() => {
-            localStorage.removeItem('token');
-            setAuthed(false);
-          }}
-        >
-          退出登录
-        </button>
+      {/* 顶栏：左右布局 */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: 12,
+        borderBottom: '1px solid #eee',
+        position: 'sticky',
+        top: 0,
+        background: '#fff',
+        zIndex: 10
+      }}>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            onClick={() => setTab('orders')}
+            style={{ padding: '8px 12px', borderRadius: 6, background: tab === 'orders' ? '#111827' : '#f3f4f6', color: tab === 'orders' ? '#fff' : '#111' }}
+          >
+            订单管理
+          </button>
+          <button
+            onClick={() => setTab('techs')}
+            style={{ padding: '8px 12px', borderRadius: 6, background: tab === 'techs' ? '#111827' : '#f3f4f6', color: tab === 'techs' ? '#fff' : '#111' }}
+          >
+            技师审核
+          </button>
+        </div>
+        <div>
+          <button
+            onClick={() => {
+              localStorage.removeItem('token');
+              setAuthed(false);
+            }}
+          >
+            退出登录
+          </button>
+        </div>
       </div>
-      <OrdersPage />
+
+      {/* 页面主体 */}
+      {tab === 'orders' && <OrdersPage />}
+      {tab === 'techs' && <TechnicianReviewPage />}
     </>
   );
 }
