@@ -9,11 +9,22 @@
 
     <textarea class="input" placeholder="说说你的感受（可选）" bindinput="onInput" value="{{content}}" maxlength="300" />
 
-    <view class="images">
-      <button size="mini" type="default" bindtap="chooseImage">添加图片（可选）</button>
-      <block wx:for="{{images}}" wx:key="*this">
-        <image class="img" src="{{item}}" mode="aspectFill" />
-      </block>
+    <view class="section">
+      <text class="label">上传图片（可选）</text>
+
+      <view class="img-grid">
+        <block wx:for="{{images}}" wx:key="*this">
+          <view class="img-cell">
+            <image class="thumb" src="{{item}}" mode="aspectFill" data-src="{{item}}" catchtap="previewImage" />
+            <view class="img-del" data-index="{{index}}" catchtap="removeImage">×</view>
+          </view>
+        </block>
+
+        <view wx:if="{{images.length < 3}}" class="img-cell add" catchtap="chooseImage">
+          <text class="plus">＋</text>
+          <text class="add-text">添加</text>
+        </view>
+      </view>
     </view>
 
     <button class="submit" type="primary" bindtap="submit">提交评价</button>

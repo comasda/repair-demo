@@ -8,3 +8,36 @@
 .images { margin-top: 12rpx; display: flex; align-items: center; flex-wrap: wrap; gap: 12rpx; }
 .img { width: 160rpx; height: 160rpx; border-radius: 8rpx; }
 .submit { margin-top: 20rpx; }
+.section { margin-top: 24rpx; }
+.label { font-size: 28rpx; color: #374151; }
+
+.img-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
+  margin-top: 12rpx;
+}
+.img-cell {
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+  background: #f3f4f6;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+.thumb {
+  position: absolute; left: 0; top: 0; right: 0; bottom: 0;
+  width: 100%; height: 100%;
+}
+.img-del {
+  position: absolute; right: 6rpx; top: 6rpx;
+  width: 36rpx; height: 36rpx; line-height: 36rpx;
+  text-align: center; color: #fff; background: rgba(0,0,0,.55);
+  border-radius: 50%;
+}
+.img-cell.add {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: #6b7280;
+}
+.plus { font-size: 48rpx; line-height: 1; }
+.add-text { font-size: 22rpx; margin-top: 6rpx; }
