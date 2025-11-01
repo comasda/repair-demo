@@ -1,7 +1,7 @@
 // pages/orderDetail/orderDetail.js
 const { get, put, post } = require('../../utils/request')
 
-const statusMap = { pending: '待接单', assigned: '已接单', checkedIn: '已签到', awaitingConfirm: '待确认', done: '已完成' }
+const statusMap = { pending: '待接单', assigned: '已接单', checkedIn: '已签到', awaitingConfirm: '待确认', done: '已完成', cancelled: '已取消' }
 const CHECKIN_RADIUS_M = 200  // 你可以改为 300/500
 
 // 计算两点经纬度的哈弗辛距离（米）
@@ -222,6 +222,35 @@ Page({
       })
       .catch(err => wx.showToast({ title: err.message || '操作失败', icon: 'none' }))
   },
+
+  // —— 客户端：取消订单（仅在 pending/offered 时显示）——
+  async cancelOrder() {
+    const { order, role, userId } = this.data
+    if (!order) return
+    if (role !== 'customer') {
+      wx.showToast({ title: '仅客户可取消', icon: 'none' }); return
+    }
+    if (!['pending', 'offered'].includes(order.status)) {
+      wx.showToast({ title: '当前状态不可取消', icon: 'none' }); return
+    }
+    const { confirm } = await wx.showModal({
+      title: '确认取消',
+      content: '取消后将无法恢复，确定继续？',
+      confirmText: '确定', cancelText: '返回'
+    }).catch(() => ({ confirm: false }))
+    if (!confirm) return
+    try {
+      await post(`/customer/${order._id}/cancel`, { customerId: userId }, { loading: true })
+      wx.showToast({ title: '订单已取消' })
+      const pages = getCurrentPages()
+      const prev = pages[pages.length - 2]
+      if (prev && typeof prev.fetchOrders === 'function') prev.fetchOrders()
+      wx.navigateBack()
+    } catch (err) {
+      wx.showToast({ icon: 'none', title: err?.message || '取消失败' })
+    }
+  },
+
   // —— 师傅端：查看用户评价（仅在已完成时展示按钮）——
    goTechViewReview() {
     const { order, role } = this.data

@@ -75,3 +75,16 @@
   margin-top: 100rpx;
   color: #999;
 }
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12rpx;
+}
+.cancel-btn {
+  background-color: #ef4444;
+  color: #fff;
+}
+.cancel-btn[disabled] {
+  opacity: 0.6;
+}

@@ -28,6 +28,20 @@
       <text>问题：{{item.issue}}</text>
       <text>师傅：{{item.technicianName || '未分配'}}</text>
     </view>
+
+    <!-- ✨新增底部操作区 -->
+    <view class="order-footer">
+      <view class="actions">
+        <button
+          wx:if="{{item.cancelable}}"
+          class="cancel-btn"
+          size="mini"
+          data-id="{{item._id}}"
+          catchtap="onCancelTap"
+          loading="{{cancelingId === item._id}}"
+        >取消订单</button>
+      </view>
+    </view>
   </view>
 </block>
 

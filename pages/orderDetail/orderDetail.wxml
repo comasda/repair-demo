@@ -39,6 +39,12 @@
 <button wx:if="{{role==='customer' && order.status==='done' && hasMyReview}}"
         type="primary" bindtap="goAppendReview">追加评价</button>
 
+<button
+  wx:if="{{role==='customer' && (order.status==='pending' || order.status==='offered')}}"
+  class="cancel-btn"
+  bindtap="cancelOrder"
+>取消订单</button>
+
 <!-- 评价列表（如有） -->
 <view wx:if="{{reviews.length}}" style="margin-top:16rpx;">
   <view style="font-weight:600;margin-bottom:8rpx;">评价</view>
