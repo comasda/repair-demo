@@ -1,4 +1,4 @@
-const { post } = require('../../../utils/request')
+const { post, uploadimage } = require('../../../utils/request')
 
 Page({
   data: {
@@ -21,6 +21,21 @@ Page({
       count: 3, sizeType: ['compressed'],
       success: res => this.setData({ images: this.data.images.concat(res.tempFilePaths) })
     })
+  },
+
+  // 预览大图
+  previewImage(e) {
+    const current = e.currentTarget.dataset.src
+    wx.previewImage({ current, urls: this.data.images })
+  },
+
+  // 移除某一张
+  removeImage(e) {
+    const idx = Number(e.currentTarget.dataset.index)
+    if (Number.isNaN(idx)) return
+    const arr = this.data.images.slice()
+    arr.splice(idx, 1)
+    this.setData({ images: arr })
   },
 
   // 选择地图位置（优先方案）
@@ -120,24 +135,35 @@ Page({
 
     const { title, desc, phone, address, images, location, locationDesc } = this.data
 
-    post('/customer', {
-      customer: user.username,   // 手机号 / 用户名
-      customerId: user.id || user._id,
-      device: title,
-      issue: desc,
-      phone,
-      address,                   // 文本地址
-      images,                    // 先存临时路径；后续可接上传接口
-      // 新增：地图坐标 + 选择位置的可读地址
-      location,                  // { lat, lng }
-      locationAddress: locationDesc
-    },{ loading: true }).then(() => {
-      wx.showToast({
-        title: '工单提交成功', icon: 'success', duration: 1000,
-        success: () => setTimeout(() => wx.reLaunch({ url: '/pages/customer/home/home' }), 1000)
+    // 1) 先把本地临时图全部上传到后端，拿到可访问 URL
+    wx.showLoading({ title: '正在上传图片…', mask: true })
+    const tasks = (images || []).map(p => uploadimage(p))
+
+    Promise.all(tasks)
+      .then((urls) => {
+        wx.hideLoading()
+        // 2) 用服务器 URL 提交订单
+        return post('/customer', {
+          customer: user.username,
+          customerId: user.id || user._id,
+          device: title,
+          issue: desc,
+          phone,
+          address,
+          images: urls,           // 使用服务器返回的 URL 列表
+          location,               // { lat, lng }
+          locationAddress: locationDesc
+        }, { loading: true })
       })
-    }).catch(err => {
-      wx.showToast({ title: err.message || '提交失败', icon: 'none' })
-    })
+      .then(() => {
+        wx.showToast({
+          title: '工单提交成功', icon: 'success', duration: 1000,
+          success: () => setTimeout(() => wx.reLaunch({ url: '/pages/customer/home/home' }), 1000)
+        })
+      })
+      .catch(err => {
+        wx.hideLoading()
+        wx.showToast({ title: err?.message || '上传或提交失败', icon: 'none' })
+      })
   }
 })

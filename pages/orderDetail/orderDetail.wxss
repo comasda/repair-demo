@@ -40,3 +40,25 @@
 }
 .hint { margin: 16rpx 0; color: #666; font-size: 26rpx; }
 .hint .sub { color: #999; font-size: 24rpx; }
+
+/* 现场图片区域 */
+.section { margin-top: 24rpx; }
+.section-title { font-size: 28rpx; color: #374151; margin-bottom: 12rpx; }
+
+.img-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
+}
+.img-cell {
+  position: relative;
+  width: 100%;
+  padding-top: 100%;     /* 正方形格子 */
+  background: #f3f4f6;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+.thumb {
+  position: absolute; left: 0; top: 0; right: 0; bottom: 0;
+  width: 100%; height: 100%;
+}

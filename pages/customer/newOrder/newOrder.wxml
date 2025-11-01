@@ -7,10 +7,21 @@
 
   <view class="section">
     <text class="label">上传图片（可选）</text>
-    <button bindtap="chooseImage">选择图片</button>
-    <view class="images">
+    <!-- 选择按钮：不足3张时可继续添加 -->
+    <button
+      class="choose-btn"
+      wx:if="{{images.length < 3}}"
+      catchtap="chooseImage"
+    >选择图片（剩{{3 - images.length}}）</button>
+
+    <!-- 缩略图网格：可预览、可删除 -->
+    <view class="img-grid">
       <block wx:for="{{images}}" wx:key="*this">
-        <image src="{{item}}" class="preview" mode="aspectFill"></image>
+        <view class="img-cell">
+          <image class="thumb" src="{{item}}" mode="aspectFill"
+                 data-src="{{item}}" catchtap="previewImage" />
+          <view class="img-del" data-index="{{index}}" catchtap="removeImage">×</view>
+        </view>
       </block>
     </view>
   </view>

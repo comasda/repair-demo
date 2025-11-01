@@ -67,6 +67,14 @@ Page({
     }).catch(() => wx.showToast({ title: '获取工单失败', icon: 'none' }))
   },
 
+  // 预览第 idx 张图片
+  previewAt(e) {
+    const idx = Number(e.currentTarget.dataset.index) || 0
+    const urls = (this.data.order && this.data.order.images) ? this.data.order.images : []
+    if (!urls.length) return
+    wx.previewImage({ current: urls[idx], urls })
+  },
+
   // —— 客户端：去评价 ——（未评价时显示）
   goReview() {
     const id = this.data.order._id

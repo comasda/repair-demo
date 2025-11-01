@@ -14,11 +14,24 @@
       <text class="line">师傅：{{order.technicianName}}</text>
     </view>
 
-    <!-- 图片（如有） -->
-    <view wx:if="{{order.images && order.images.length}}" class="order-images">
-      <block wx:for="{{order.images}}" wx:key="*this">
-        <image class="order-img" mode="aspectFill" src="{{item}}" />
-      </block>
+    <!-- 现场图片 -->
+    <view wx:if="{{order && order.images && order.images.length}}" class="section">
+      <view class="section-title">现场图片</view>
+
+      <view class="img-grid">
+        <block wx:for="{{order.images}}" wx:key="*this" wx:for-item="url" wx:for-index="idx">
+          <view class="img-cell">
+            <image
+              class="thumb"
+              src="{{url}}"
+              mode="aspectFill"
+              data-index="{{idx}}"
+              catchtap="previewAt"
+              lazy-load="true"
+            />
+          </view>
+        </block>
+      </view>
     </view>
   </view>
 

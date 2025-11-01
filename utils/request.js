@@ -53,10 +53,32 @@ const request = (url, method = 'GET', data = {}, options = {}) => {
   })
 }
 
+// 新增：单文件上传（返回服务器 URL）
+const uploadimage = (filePath) => {
+  const baseUrl = getApp().globalData.API || ''
+  const token = wx.getStorageSync('token')
+  return new Promise((resolve, reject) => {
+    wx.uploadFile({
+      url: `${baseUrl}/upload`,
+      filePath,
+      name: 'file',
+      header: token ? { Authorization: `Bearer ${token}` } : {},
+      success(res) {
+        try {
+          const data = JSON.parse(res.data || '{}')
+          if (data && data.url) return resolve(data.url)
+          reject(data || { message: '上传失败' })
+        } catch (e) { reject(e) }
+      },
+      fail: reject
+    })
+  })
+}
+
 // 常用方法简化
 const get  = (url, data, options) => request(url, 'GET',    data, options)
 const post = (url, data, options) => request(url, 'POST',   data, options)
 const put  = (url, data, options) => request(url, 'PUT',    data, options)
 const del  = (url, data, options) => request(url, 'DELETE', data, options)
 
-module.exports = { request, get, post, put, del }
+module.exports = { request, get, post, put, del, uploadimage }
