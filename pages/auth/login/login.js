@@ -7,7 +7,7 @@ Page({
     password: '',
     code: '',
     mode: 'password', // password 或 code
-    passwordVisible: false,
+    passwordVisible: false
   },
 
   onPhoneInput(e) { this.setData({ phone: e.detail.value }) },
@@ -18,6 +18,10 @@ Page({
     this.setData({ mode: this.data.mode === 'password' ? 'code' : 'password' })
   },
 
+  // 👁️ 切换密码可见性
+  togglePasswordVisible() {
+    this.setData({ passwordVisible: !this.data.passwordVisible });
+  },
   togglePasswordVisible() { this.setData({ passwordVisible: !this.data.passwordVisible }) },
   // 密码登录
   loginWithPassword() {

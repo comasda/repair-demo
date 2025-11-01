@@ -37,31 +37,40 @@
 
 /* 🟢 输入框本体（去自带边框，使用外层） */
 .login-input {
-  width: 100%;
+  flex: 1; 
   height: 40rpx;
   border: none;
   outline: none;
   font-size: 30rpx;
   color: #333;
-  padding-right: 76rpx;          /* 给右侧图标留空间 */
   box-sizing: border-box;
   background: transparent;
 }
 
-/* 🟢 特定：有图标的容器再多留点空间 */
-.has-icon .login-input { padding-right: 88rpx; }
-
-/* 🟢 小眼睛图标 */
-.eye-icon {
-  position: absolute;
-  right: 20rpx;
-  top: 50%;
-  width: 44rpx;
-  height: 44rpx;
-  transform: translateY(-50%);
-  opacity: 0.82;
+/* ---- 小眼睛按钮（与 input 同级，不覆盖原生控件） ---- */
+.has-icon {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
 }
-.eye-icon:active { opacity: 1; }
+.eye-btn {
+  width: 56rpx;
+  height: 56rpx;
+  flex: 0 0 56rpx;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 44rpx 44rpx;
+  opacity: 0.85;
+}
+.eye-btn:active { opacity: 1; }
+
+/* 使用内联 SVG（data URI）— 无需本地图标 */
+.eye-btn.open {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cpath d='M32 11C12 14 2.5 32 2.5 32S11 50 32 50s29.5-18 29.5-18S52 14 32 11Z' fill='%235b72f2'/%3E%3Ccircle cx='32' cy='32' r='7' fill='%23fff'/%3E%3C/svg%3E");
+}
+.eye-btn.closed {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cpath d='M32 12C12 15 2.5 32 2.5 32S11 49 32 49c8.5 0 15.3-2.9 21-7.5' fill='none' stroke='%23cccccc' stroke-width='4'/%3E%3Cpath d='M7 18l50 28' stroke='%23cccccc' stroke-width='4'/%3E%3C/svg%3E");
+}
 
 /* 按钮 */
 .btn-group {

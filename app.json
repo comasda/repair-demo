@@ -17,9 +17,8 @@
     "pages/technician/reviewList/reviewList"
   ],
 
-  "usingComponents": {
-    "verify-code": "/components/verify-code/verify-code"
-  },
+  "lazyCodeLoading": "requiredComponents",
+
   "window": {
     "navigationBarBackgroundColor": "#6366f1",
     "navigationBarTextStyle": "white",
