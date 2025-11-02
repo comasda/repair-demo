@@ -5,3 +5,7 @@ export const listOrders = (status?: string) =>
 
 export const assignOrder = (id: string, technicianId: string, technicianName: string) =>
   http.post(`/admin/orders/${id}/assign`, { technicianId, technicianName });
+
+export async function updateOrderStatus(id: string, status: string, reason?: string) {
+  return http.post(`/admin/orders/${id}/status`, { status, reason });
+}

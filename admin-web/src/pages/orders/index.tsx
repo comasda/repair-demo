@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useOrders } from './hooks/useOrders';
 import OrdersTable from './components/OrdersTable';
+import StatusModal from './components/StatusModal';
 import AssignModal from './components/AssignModal';
 import type { Order } from './types';
 import { exportOrders } from './services/orderApi';
@@ -9,6 +10,7 @@ export default function OrdersPage() {
   const { orders, loading, status, setStatus, load, handleAssign, assigningId } = useOrders();
   const [modalVisible, setModalVisible] = useState(false);
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
+  const [statusModalVisible, setStatusModalVisible] = useState(false);
   const [exporting, setExporting] = useState(false);
 
   // ✅ 登录检查：若无 token，提示并跳回登录页
@@ -22,6 +24,16 @@ export default function OrdersPage() {
   function openAssign(order: Order) {
     setCurrentOrder(order);
     setModalVisible(true);
+  }
+
+  function openStatusModal(order: Order) {
+    setCurrentOrder(order);
+    setStatusModalVisible(true);
+  }
+
+  async function confirmStatusChange() {
+    await load(); // 刷新订单列表
+    setStatusModalVisible(false);
   }
 
   async function confirmAssign(technicianId: string, technicianName: string) {
@@ -83,13 +95,26 @@ export default function OrdersPage() {
       </div>
 
       {/* 表格 */}
-      <OrdersTable data={orders || []} assigningId={assigningId} onAssignClick={openAssign} />
+      <OrdersTable
+        data={orders || []}
+        assigningId={assigningId}
+        onAssignClick={openAssign}
+        onStatusClick={openStatusModal}
+      />
 
       {/* 指派弹窗 */}
       <AssignModal
         visible={modalVisible}
         onOk={confirmAssign}
         onCancel={() => setModalVisible(false)}
+      />
+
+      {/* 修改状态弹窗 */}
+      <StatusModal
+        visible={statusModalVisible}
+        order={currentOrder}
+        onOk={confirmStatusChange}
+        onCancel={() => setStatusModalVisible(false)}
       />
     </div>
   );

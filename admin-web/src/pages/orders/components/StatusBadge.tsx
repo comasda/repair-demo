@@ -8,6 +8,7 @@ const labelMap: Record<OrderStatus, string> = {
   checkedIn: '已到场',
   awaitingConfirm: '待确认',
   done: '已完成',
+  cancelled: '已取消',
 };
 
 const colorMap: Record<OrderStatus, string> = {
@@ -17,6 +18,7 @@ const colorMap: Record<OrderStatus, string> = {
   checkedIn: '#10b981',
   awaitingConfirm: '#a855f7',
   done: '#22c55e',
+  cancelled: '#ef4444',
 };
 
 export default function StatusBadge({ s }: { s: OrderStatus }) {

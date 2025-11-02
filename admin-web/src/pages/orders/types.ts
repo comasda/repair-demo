@@ -5,7 +5,8 @@ export type OrderStatus =
   | 'assigned'
   | 'checkedIn'
   | 'awaitingConfirm'
-  | 'done';
+  | 'done'
+  | 'cancelled'
 
 export interface Order {
   _id: string;

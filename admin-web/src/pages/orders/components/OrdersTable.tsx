@@ -6,6 +6,7 @@ interface Props {
   data: Order[];
   assigningId?: string | null;
   onAssignClick: (row: Order) => void;
+  onStatusClick: (row: Order) => void;
 }
 
 const th: React.CSSProperties = {
@@ -23,7 +24,7 @@ const td: React.CSSProperties = {
   verticalAlign: 'top',
 };
 
-export default function OrdersTable({ data, assigningId, onAssignClick }: Props) {
+export default function OrdersTable({ data, assigningId, onAssignClick, onStatusClick  }: Props) {
   return (
     <div style={{ overflowX: 'auto' }}>
       <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff', border: '1px solid #eee' }}>
@@ -72,6 +73,20 @@ export default function OrdersTable({ data, assigningId, onAssignClick }: Props)
                   }}
                 >
                   {assigningId === row._id ? '指派中…' : '指派'}
+                </button>
+                <button
+                  onClick={() => onStatusClick(row)}
+                  style={{
+                    marginLeft: 6,
+                    padding: '6px 10px',
+                    borderRadius: 6,
+                    border: '1px solid #e5e7eb',
+                    background: '#2563eb',
+                    color: '#fff',
+                    cursor: 'pointer',
+                  }}
+                >
+                  修改状态
                 </button>
               </td>
             </tr>
