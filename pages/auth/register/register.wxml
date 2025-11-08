@@ -28,6 +28,11 @@
     </button>
   </view>
 
+  <!-- ✅ 固定验证码提示 -->
+  <view wx:if="{{useFixedOtp}}" class="otp-hint">
+    测试环境验证码：<text class="otp-code">123456</text>
+  </view>
+
   <!-- 密码 & 确认密码 -->
   <view class="row">
     <text>密码</text>

@@ -99,3 +99,15 @@ button[type="primary"] {
 .safe-bottom {
   height: 40rpx;
 }
+
+.otp-hint {
+  margin-top: 12rpx;
+  color: #6b7280;
+  font-size: 26rpx;
+  text-align: left;
+}
+
+.otp-code {
+  color: #111827;
+  font-weight: 600;
+}

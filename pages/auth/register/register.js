@@ -20,6 +20,8 @@ Page({
     // 验证码倒计时
     countdown: 0,
     sending: false,
+    // ✅ 是否启用固定验证码模式（由后端返回 hint:'fixed' 控制）
+    useFixedOtp: true,
   },
 
   onPhoneInput(e) { this.setData({ phone: e.detail.value }) },
@@ -52,8 +54,18 @@ Page({
     }
     try {
       this.setData({ sending: true })
-      await post('/users/captcha/send', { phone: cleanPhone, scene: 'register' })
+      const res = await post('/users/captcha/send', { phone: cleanPhone, scene: 'register' })
       wx.showToast({ title: '验证码已发送' })
+
+      // ✅ 检测是否为固定验证码模式
+      if (res && res.hint === 'fixed') {
+        this.setData({ useFixedOtp: true });
+        wx.showToast({
+          title: '测试环境验证码：123456',
+          icon: 'none',
+          duration: 3000
+        });
+      }
       this.setData({ countdown: 60 })
       this.__timer && clearInterval(this.__timer)
       this.__timer = setInterval(() => {
