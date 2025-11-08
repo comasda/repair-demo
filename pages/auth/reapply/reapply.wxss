@@ -1,0 +1,104 @@
+/* 页面背景与卡片风格，保持与注册页一致 */
+.page {
+  padding: 24rpx;
+  background: #f5f6f8;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  box-shadow: 0 6rpx 24rpx rgba(0,0,0,0.06);
+  border: 1rpx solid #eaecef;
+}
+
+.card-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 20rpx;
+}
+
+/* 表单 */
+.form-item { margin-top: 20rpx; }
+.label {
+  font-size: 26rpx;
+  color: #6b7280;
+  margin-bottom: 8rpx;
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;          /* 行内元素间距 */
+}
+.flex-1 { flex: 1 1 auto; min-width: 0; }
+.ml-12 { margin-left: 12rpx; }
+
+.input {
+  width: 100%;
+  height: 80rpx;
+  padding: 0 22rpx;
+  box-sizing: border-box;
+  background: #f9fafb;
+  border: 1rpx solid #e5e7eb;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  color: #111827;
+}
+
+/* 图片预览 */
+.images { margin-top: 12rpx; display: flex; flex-wrap: wrap; gap: 12rpx; }
+.preview {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 12rpx;
+  border: 1rpx solid #e5e7eb;
+  background: #f3f4f6;
+}
+
+/* 提交区域 */
+.actions .btn-primary {
+  width: 30%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: #0f172a;
+  color: #fff;
+  border-radius: 24rpx;
+}
+
+/* 按钮样式（复用注册页的深色按钮风格） */
+.btn {
+  height: 80rpx;
+  padding: 0 28rpx;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  background: #e5e7eb;
+  color: #111827;
+}
+.btn-primary {
+  width: 100%;
+  background: #0f172a;
+  color: #ffffff;
+}
+.btn-dark {
+  flex: none;             /* ✅ 不参与伸缩 */
+  height: 80rpx;
+  line-height: 80rpx;
+  padding: 0 28rpx;       /* 控制按钮宽度感 */
+  background: #0f172a;
+  color: #fff;
+  border-radius: 24rpx;
+}
+
+/* 验证码提示 */
+.otp-hint {
+  margin-top: 10rpx;
+  color: #6b7280;
+  font-size: 24rpx;
+}
+.otp-code {
+  color: #111827;
+  font-weight: 600;
+}

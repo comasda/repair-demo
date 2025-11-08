@@ -39,7 +39,25 @@ Page({
         wx.showToast({ title: '登录成功' })
         this.jumpByRole(res.user.role)
     }).catch(err => {
-      wx.showToast({ title: err.message || '账号或密码错误', icon: 'none' })
+        const msg = err.message || '登录失败';
+        if (err.code === 'ACCOUNT_PENDING') {
+          wx.showModal({
+            title: '账号待审核',
+            content: '您的账号正在审核中，请稍后再试。',
+            showCancel: false
+          });
+        } else if (err.code === 'ACCOUNT_REJECTED') {
+          wx.showModal({
+            title: '审核被驳回',
+            content: `原因：${err.reason || '未填写'}`,
+            confirmText: '重新提交',
+            success: (res) => {
+              if (res.confirm) wx.navigateTo({ url: '/pages/auth/reapply/reapply' });
+            }
+          });
+        } else {
+          wx.showToast({ title: msg, icon: 'none' });
+        }
     })
   },
 

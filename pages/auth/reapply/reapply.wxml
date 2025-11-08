@@ -1,0 +1,61 @@
+<view class="page">
+  <!-- 卡片容器 -->
+  <view class="card">
+
+    <view class="card-title">重新提交审核</view>
+
+    <!-- 手机号 -->
+    <view class="form-item">
+      <view class="label">手机号</view>
+      <input class="input" placeholder="请输入注册手机号" bindinput="onPhoneInput" />
+    </view>
+
+    <!-- 验证码 + 发送 -->
+    <view class="form-item">
+      <view class="label">验证码</view>
+      <view class="row">
+        <input class="input flex-1" placeholder="请输入验证码" bindinput="onCodeInput" />
+        <button class="btn btn-dark ml-12"
+                bindtap="sendCaptcha"
+                disabled="{{countdown>0 || sending}}">
+          {{ countdown > 0 ? (countdown + '秒后重发') : '获取验证码' }}
+        </button>
+      </view>
+      <!-- 固定验证码提示 -->
+      <view wx:if="{{useFixedOtp}}" class="otp-hint">
+        测试环境验证码：<text class="otp-code">123456</text>
+      </view>
+    </view>
+
+    <!-- 姓名 -->
+    <view class="form-item">
+      <view class="label">姓名</view>
+      <input class="input" placeholder="请输入姓名" bindinput="onNameInput" />
+    </view>
+
+    <!-- 身份证号 -->
+    <view class="form-item">
+      <view class="label">身份证号</view>
+      <input class="input" placeholder="请输入身份证号码" bindinput="onNumberInput" />
+    </view>
+
+    <!-- 证件照片（可选） -->
+<!--    <view class="form-item">
+      <view class="label">身份证照片（可选）</view>
+      <view class="row">
+        <button class="btn" bindtap="chooseImage">选择图片</button>
+      </view>
+      <view class="images">
+        <block wx:for="{{images}}" wx:key="*this">
+          <image class="preview" src="{{item}}" mode="aspectFill"></image>
+        </block>
+      </view>
+    </view>
+-->
+    <!-- 提交 -->
+    <view class="actions">
+      <button class="btn btn-primary" bindtap="submitResubmit">提交审核</button>
+    </view>
+
+  </view>
+</view>

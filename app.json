@@ -3,6 +3,7 @@
     "pages/auth/login/login",
     "pages/auth/phoneLogin/phoneLogin",
     "pages/auth/register/register",
+    "pages/auth/reapply/reapply",
     "pages/customer/home/home",
     "pages/customer/newOrder/newOrder",
     "pages/customer/myOrders/myOrders",
