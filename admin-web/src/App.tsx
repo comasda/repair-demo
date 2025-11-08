@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { auth } from './store/auth';
 import OrdersPage from './pages/orders';
 import TechnicianReviewPage from './pages/technicians';
+import CustomerReviewPage from './pages/customers';
 
 // 简单判断是否已登录（存在 token 即视为已登录）
 const isAuthed = () => Boolean(localStorage.getItem('token'));
@@ -63,7 +64,7 @@ function LoginPage({ onLogin }: { onLogin: () => void }) {
 
 export default function App() {
   const [authed, setAuthed] = useState(isAuthed());
-  const [tab, setTab] = useState<'orders' | 'techs'>('orders'); // 👈 当前页
+  const [tab, setTab] = useState<'orders' | 'techs' | 'customers'>('orders'); // 👈 当前页
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -99,6 +100,12 @@ export default function App() {
           >
             技师审核
           </button>
+          <button
+            onClick={() => setTab('customers')}
+            style={{ padding: '8px 12px', borderRadius: 6, background: tab === 'customers' ? '#111827' : '#f3f4f6', color: tab === 'customers' ? '#fff' : '#111' }}
+          >
+            客户审核
+          </button>
         </div>
         <div>
           <button
@@ -115,6 +122,7 @@ export default function App() {
       {/* 页面主体 */}
       {tab === 'orders' && <OrdersPage />}
       {tab === 'techs' && <TechnicianReviewPage />}
+      {tab === 'customers' && <CustomerReviewPage />}
     </>
   );
 }

@@ -11,10 +11,8 @@ Page({
     roles: ['客户', '师傅'],
     roleIndex: 0,
     roleText: '客户',
-    // 客户
-    name: '',
-    gender: '', // 'male' | 'female'
-    // 师傅
+    // 统一实名信息（客户/师傅一致）
+    // 真实姓名 + 身份证号
     idName: '',
     idNumber: '',
     // 验证码倒计时
@@ -36,11 +34,8 @@ Page({
       role: idx === 1 ? 'technician' : 'customer'
     })
   },
-  onNameInput(e) { this.setData({ name: e.detail.value }) },
-  onGenderChange(e) {
-    const idx = Number(e.detail.value)
-    this.setData({ gender: idx === 0 ? 'male' : 'female' })
-  },
+
+  // 统一实名输入
   onIdNameInput(e) { this.setData({ idName: e.detail.value }) },
   onIdNumberInput(e) { this.setData({ idNumber: e.detail.value }) },
 
@@ -83,7 +78,7 @@ Page({
   registerUser() {
     const {
       phone, code, password, confirmPwd,
-      role, roleText, name, gender, idName, idNumber
+      role, roleText, idName, idNumber
     } = this.data
     const cleanPhone = (phone || '').trim()
 
@@ -101,44 +96,30 @@ Page({
 
     // 映射身份到内部角色
     // 角色必填项校验
-    if (role === 'customer') {
-      if (!name || !gender) {
-        wx.showToast({ title: '请填写姓名与性别', icon: 'none' }); return
-      }
-    } else if (role === 'technician') {
-      if (!idName || !idNumber) {
-        wx.showToast({ title: '请填写身份证姓名与号码', icon: 'none' }); return
-      }
+    // 统一实名校验：客户/师傅均需姓名+身份证号
+    if (!idName || !idNumber) {
+      wx.showToast({ title: '请填写姓名与身份证号', icon: 'none' }); return
     }
 
-    // 调用后端接口注册
     // 调用后端接口注册（验证码注册）
     post('/users/register', {
       phone: cleanPhone,
       password,
       code,
       role,
-      profile: { name, gender },
+      // 兼容老接口：把姓名也放到 profile.name 中（无性别）
+      profile: { name: idName },
       idCard: { name: idName, number: idNumber }
     }).then(async (res) => {
-      wx.setStorageSync('currentUser', res.user)
-      if (res.accessToken) {
-        wx.setStorageSync('token', res.accessToken)      // 注册即得 token
-      } else {
-        // 兼容后端未返回 token 的老版本：注册后自动登录一次
-        const loginRes = await post('/users/login', { username: cleanPhone, password })
-        wx.setStorageSync('token', loginRes.accessToken)
-      }
+      // ✅ 新规则：提交成功 → 进入审核，不自动登录、不跳转首页
       wx.showToast({
-        title: '注册成功',
+        title: '提交成功，待审核',
         icon: 'success',
-        duration: 1000,
-        success: () => {
-          setTimeout(() => {
-            this.jumpByRole(role)
-          }, 1000)
-        }
+        duration: 1500
       })
+      setTimeout(() => {
+        wx.reLaunch({ url: '/pages/auth/login/login' })
+      }, 1500)
     }).catch(err => {
       wx.showToast({ title: err.message || '注册失败', icon: 'none' })
     })

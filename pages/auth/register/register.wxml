@@ -43,33 +43,17 @@
     <input password placeholder="请再次输入密码" value="{{confirmPwd}}" bindinput="onConfirmPwdInput" />
   </view>
 
-  <!-- 客户必填：姓名、性别 -->
-  <view wx:if="{{role==='customer'}}">
-    <view class="row">
-      <text>姓名</text>
-      <input placeholder="请输入姓名" value="{{name}}" bindinput="onNameInput" />
-    </view>
-    <view class="row">
-      <text>性别</text>
-      <picker mode="selector" range="{{['男','女']}}" bindchange="onGenderChange">
-        <view class="picker">
-          {{ gender==='male' ? '男' : (gender==='female' ? '女' : '请选择') }}
-        </view>
-      </picker>
-    </view>
+  <!-- 师傅必填：身份证姓名 & 身份证号 -->
+
+  <view class="row">
+    <text>姓名</text>
+    <input placeholder="请输入姓名" value="{{idName}}" bindinput="onIdNameInput" />
+  </view>
+  <view class="row">
+    <text>身份证号</text>
+    <input placeholder="请输入身份证号码" value="{{idNumber}}" bindinput="onIdNumberInput" />
   </view>
 
-  <!-- 师傅必填：身份证姓名 & 身份证号 -->
-  <view wx:if="{{role==='technician'}}">
-    <view class="row">
-      <text>身份证姓名</text>
-      <input placeholder="请输入身份证姓名" value="{{idName}}" bindinput="onIdNameInput" />
-    </view>
-    <view class="row">
-      <text>身份证号</text>
-      <input placeholder="请输入身份证号码" value="{{idNumber}}" bindinput="onIdNumberInput" />
-    </view>
-  </view>
 
       <button type="primary" bindtap="registerUser">注册</button>
     </view>
