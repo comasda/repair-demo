@@ -226,24 +226,24 @@ Page({
       .catch(err => wx.showToast({ title: err.message || '操作失败', icon: 'none' }))
   },
 
-  // —— 客户端：确认完成（仅在待确认时可用）——
-  confirmComplete() {
-    const { order, role, userId } = this.data
-    if (!order) return
-    if (role !== 'customer') {
-      wx.showToast({ title: '仅客户可确认完成', icon: 'none' }); return
-    }
-    if (order.status !== 'awaitingConfirm') {
-      wx.showToast({ title: '当前状态不可确认', icon: 'none' }); return
-    }
-    post(`/customer/${order._id}/complete-confirm`, { customerId: userId })
-      .then(() => {
-        wx.showToast({ title: '订单已完成' })
-        // 可选：完成后引导去评价
-        setTimeout(() => this.goReview(), 600)
-      })
-      .catch(err => wx.showToast({ title: err.message || '操作失败', icon: 'none' }))
-  },
+  // —— 客户端：确认完成（废弃）——
+  // confirmComplete() {
+  //   const { order, role, userId } = this.data
+  //   if (!order) return
+  //   if (role !== 'customer') {
+  //     wx.showToast({ title: '仅客户可确认完成', icon: 'none' }); return
+  //   }
+  //   if (order.status !== 'awaitingConfirm') {
+  //     wx.showToast({ title: '当前状态不可确认', icon: 'none' }); return
+  //   }
+  //   post(`/customer/${order._id}/complete-confirm`, { customerId: userId })
+  //     .then(() => {
+  //       wx.showToast({ title: '订单已完成' })
+  //       // 可选：完成后引导去评价
+  //       setTimeout(() => this.goReview(), 600)
+  //     })
+  //     .catch(err => wx.showToast({ title: err.message || '操作失败', icon: 'none' }))
+  // },
 
   // —— 客户端：取消订单（仅在 pending/offered 时显示）——
   async cancelOrder() {

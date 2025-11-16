@@ -128,11 +128,11 @@
   >需先到场签到后才能完成</button>
 </view>
 
-<!-- 客户端：确认完成（仅当待确认） -->
+<!-- 客户端：确认完成（废弃） 
 <view wx:if="{{role==='customer' && order.status==='awaitingConfirm'}}" class="section">
   <button class="primary-btn" bindtap="confirmComplete">确认完成</button>
 </view>
-
+-->
 <!-- 状态提示（可选）：展示“待确认” -->
 <view wx:if="{{order.status==='awaitingConfirm'}}" class="hint">
   订单已由师傅发起完成，等待管理员确认
