@@ -95,37 +95,68 @@
 
 <!-- 师傅端：发起完成（仅当已签到） -->
 <view wx:if="{{role==='technician'}}" class="section">
-<!-- ★★★ 签到照片上传区（师傅端，状态=已签到） -->
-  <view wx:if="{{role=='technician' && order.status=='checkedIn'}}" class="checkin-upload-box">
+<!-- 师傅端：签到后上传分类图片/视频 -->
+<view wx:if="{{role === 'technician' && order && order.status === 'checkedIn'}}" class="checkin-section">
+  <view class="section-title">到场佐证（图片或视频）</view>
 
-    <view class="checkin-title">上传签到照片（需上传 5 张）</view>
+  <block wx:for="{{checkinSlots}}" wx:key="key">
+    <view class="checkin-slot">
+      <view class="slot-header">
+        {{index + 1}}. {{item.label}}
+      </view>
 
-    <view class="checkin-images">
-      <block wx:for="{{checkinImages}}" wx:key="index">
-        <view class="img-item">
-          <image src="{{item}}" bindtap="previewCheckin" data-index="{{index}}"></image>
-          <view class="remove-btn" bindtap="removeCheckin" data-index="{{index}}">×</view>
+      <view class="slot-tips">{{item.tips}}</view>
+
+      <view class="slot-body">
+        <!-- 已选择文件 -->
+        <view wx:if="{{item.filePath}}">
+          <image
+            wx:if="{{item.fileType === 'image'}}"
+            src="{{item.filePath}}"
+            class="slot-media"
+            mode="aspectFill"
+            bindtap="previewCheckinSlot"
+            data-index="{{index}}"
+          />
+          <video
+            wx:elif="{{item.fileType === 'video'}}"
+            src="{{item.filePath}}"
+            class="slot-media"
+            controls
+          ></video>
+
+          <button
+            class="slot-remove-btn"
+            bindtap="removeCheckinSlot"
+            data-index="{{index}}"
+          >
+            删除
+          </button>
         </view>
-      </block>
 
-      <!-- 添加图片按钮 -->
-      <view class="img-add" wx:if="{{checkinImages.length < 5}}" bindtap="chooseCheckinImage">
-        <text>+</text>
+        <!-- 未选择文件 -->
+        <view
+          wx:else
+          class="slot-uploader"
+          bindtap="chooseCheckinMedia"
+          data-index="{{index}}"
+        >
+          <text class="slot-uploader-plus">＋</text>
+          <text class="slot-uploader-text">点击上传 {{item.label}}</text>
+        </view>
       </view>
     </view>
+  </block>
 
+  <view class="checkin-actions">
+    <button class="btn-secondary" bindtap="saveCheckinDraft">
+      暂存（不发起完成）
+    </button>
+    <button class="btn-primary" bindtap="requestComplete">
+      发起完成申请
+    </button>
   </view>
-  <button
-    class="primary-btn"
-    bindtap="requestComplete"
-    wx:if="{{order.status==='checkedIn'}}"
-  >发起完成</button>
-
-  <button
-    class="primary-btn disabled"
-    wx:if="{{order.status!=='checkedIn' && order.status!=='done' && order.status!=='awaitingConfirm'}}"
-    disabled="true"
-  >需先到场签到后才能完成</button>
+</view>
 </view>
 
 <!-- 客户端：确认完成（废弃） 

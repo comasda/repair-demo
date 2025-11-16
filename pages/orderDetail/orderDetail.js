@@ -1,8 +1,27 @@
 // pages/orderDetail/orderDetail.js
 const { get, put, post, uploadimage } = require('../../utils/request')
 
-const statusMap = { pending: '待接单', offered: '待接收', assigned: '已接单', checkedIn: '已签到', awaitingConfirm: '待确认', done: '已完成', cancelled: '已取消' }
+const statusMap = {
+  pending: '待接单',
+  offered: '待接收',
+  assigned: '已接单',
+  checkedIn: '已签到',
+  awaitingConfirm: '待完成审核',
+  done: '已完成',
+  cancelled: '已取消'
+}
 const CHECKIN_RADIUS_M = 200  // 你可以改为 300/500
+
+// ★ 五个分类坑位的配置
+const CHECKIN_SLOTS = [
+  { key: 'front',   label: '设备正面图片', tips: '请上传设备正面整体照片' },
+  { key: 'circuit', label: '电路图',       tips: '请上传电路图' },
+  { key: 'qrcode',  label: '二维码',       tips: '请二维码照片' },
+  { key: 'site',    label: '维修点图片',   tips: '请上传维修现场照片' },
+  { key: 'finish',  label: '维修完成图片', tips: '请上传维修完成后的照片' }
+]
+
+const DRAFT_KEY_PREFIX = 'checkinDraft:'
 
 // 计算两点经纬度的哈弗辛距离（米）
 function haversineDistance(lat1, lon1, lat2, lon2) {
@@ -26,7 +45,16 @@ Page({
     statusText: '',
     reviews: [],
     hasMyReview: false,
-    checkinImages: []
+
+    // ★ 五个分类坑位，每个坑位允许 1 个图片或视频
+    checkinSlots: CHECKIN_SLOTS.map(s => ({
+      key: s.key,
+      label: s.label,
+      tips: s.tips,
+      filePath: '',   // 本地临时路径（图片或视频）
+      fileType: '',   // image | video
+      uploadedUrl: '' // 预留：如果后面要做断点续传可以用
+    }))
   },
 
   onLoad(options) {
@@ -51,24 +79,25 @@ Page({
       res._lat = loc.lat != null ? loc.lat : res.lat
       res._lng = loc.lng != null ? loc.lng : res.lng
 
-      // ↓ 评价处理：把 reviews 放进 data，并判断是否有我自己的评价
       const reviews = Array.isArray(res.reviews) ? res.reviews : []
       const me = this.data.userId
       const hasMyReview = reviews.some(r => r.customerId === me)
-      
-      let statusText
-      // 统一用 statusMap（已含 checkedIn/awaitingConfirm），若无则回退原值
-      statusText = statusMap[res.status] || res.status
+
+      const statusText = statusMap[res.status] || res.status
+
       this.setData({
         order: res,
         statusText,
         reviews,
         hasMyReview
       })
+
+      // ★ 读取本地暂存的签到媒资
+      this._loadCheckinDraft(res._id || res.id)
     }).catch(() => wx.showToast({ title: '获取工单失败', icon: 'none' }))
   },
 
-  // 预览第 idx 张图片
+  // 预览报修图片（客户上传的）
   previewAt(e) {
     const idx = Number(e.currentTarget.dataset.index) || 0
     const urls = (this.data.order && this.data.order.images) ? this.data.order.images : []
@@ -82,7 +111,7 @@ Page({
     wx.navigateTo({
       url: `/pages/customer/review/review?id=${id}&mode=first`,
       events: {
-        'review:refresh': () => this.loadOrder(id) // 收到事件后刷新详情
+        'review:refresh': () => this.loadOrder(id)
       }
     })
   },
@@ -124,7 +153,7 @@ Page({
           const dist = Math.round(haversineDistance(lat, lng, order._lat, order._lng))
 
           if (dist <= CHECKIN_RADIUS_M) {
-            this._postCheckin(order._id, lat, lng)  // 成功：提交签到
+            this._postCheckin(order._id, lat, lng)
           } else {
             wx.showToast({
               title: `距工单位置约${dist}米，需在${CHECKIN_RADIUS_M}米内才能签到`,
@@ -152,7 +181,6 @@ Page({
       })
     }
 
-    // 隐私/权限链路
     wx.getPrivacySetting?.({
       success: (ps) => {
         const go = () => {
@@ -188,19 +216,57 @@ Page({
       lat, lng,
       technicianId: userId,
       technicianName: userName
-      // 不再上传 address；后端根据订单坐标判断合规（见下文后端校验）
     }).then(() => {
       wx.showToast({ title: '签到成功' })
       this.loadOrder(orderId)
     }).catch(err => {
-      // 若后端也做了半径校验，可能在这里被拒绝
       wx.showToast({ title: err.message || '签到失败', icon: 'none' })
     })
   },
 
+  // ★ 暂存到本地（不发起完成）
+  saveCheckinDraft() {
+    const { order, checkinSlots } = this.data
+    if (!order || !order._id) {
+      wx.showToast({ title: '订单信息缺失', icon: 'none' })
+      return
+    }
+    try {
+      wx.setStorageSync(DRAFT_KEY_PREFIX + order._id, checkinSlots)
+      wx.showToast({ title: '已暂存，不会发起完成', icon: 'none' })
+    } catch (e) {
+      wx.showToast({ title: '暂存失败', icon: 'none' })
+    }
+  },
+
+  // 读取本地暂存
+  _loadCheckinDraft(orderId) {
+    if (!orderId) return
+    try {
+      const draft = wx.getStorageSync(DRAFT_KEY_PREFIX + orderId)
+      if (Array.isArray(draft) && draft.length === CHECKIN_SLOTS.length) {
+        this.setData({ checkinSlots: draft })
+      } else {
+        // 重置成默认空
+        this.setData({
+          checkinSlots: CHECKIN_SLOTS.map(s => ({
+            key: s.key,
+            label: s.label,
+            tips: s.tips,
+            filePath: '',
+            fileType: '',
+            uploadedUrl: ''
+          }))
+        })
+      }
+    } catch (e) {
+      // ignore
+    }
+  },
+
   // —— 师傅端：发起完成（仅在已签到时可用）——
   requestComplete() {
-    const { order, role, userId } = this.data
+    const { order, role, userId, checkinSlots } = this.data
     if (!order) return
     if (role !== 'technician') {
       wx.showToast({ title: '仅师傅可发起完成', icon: 'none' }); return
@@ -208,42 +274,54 @@ Page({
     if (order.status !== 'checkedIn') {
       wx.showToast({ title: '需到场签到后才能发起完成', icon: 'none' }); return
     }
-    // ★ 必须上传签到照片
-    if (this.data.checkinImages.length < 5) {
-      wx.showToast({ title: '请上传 5 张签到照片', icon: 'none' })
+
+    // ★ 校验 5 个分类坑位都已上传
+    const missingIndex = checkinSlots.findIndex(s => !s.filePath)
+    if (missingIndex !== -1) {
+      const slot = CHECKIN_SLOTS[missingIndex]
+      wx.showToast({ title: `请先上传：${slot.label}`, icon: 'none' })
       return
     }
-    const uploadTasks = this.data.checkinImages.map(p => uploadimage(p))
 
-    Promise.all(uploadTasks).then(urls => {
-      // 2) 调用发起完成接口，并把签到图放进去
-      return post(`/technicians/${order._id}/complete-request`, {
-        technicianId: userId,
-        checkinImages: urls    // ★ 发给后台
+    const localPaths = checkinSlots.map(s => s.filePath)
+
+    wx.showLoading({ title: '正在上传...', mask: true })
+    const uploadTasks = localPaths.map(p => uploadimage(p))
+
+    Promise.all(uploadTasks)
+      .then(urls => {
+        wx.hideLoading()
+        // ★ 兼容后端：仍然传 checkinImages（数组），保持顺序
+        const checkinImages = urls
+
+        // ★ 额外带一份带分类的信息（后端现在即使忽略也没关系）
+        const checkinMedia = {}
+        urls.forEach((url, idx) => {
+          const slotMeta = CHECKIN_SLOTS[idx]
+          const slot = checkinSlots[idx]
+          checkinMedia[slotMeta.key] = {
+            url,
+            type: slot.fileType || 'image'
+          }
+        })
+
+        return post(`/technicians/${order._id}/complete-request`, {
+          technicianId: userId,
+          checkinImages,
+          checkinMedia   // 后端改造时可用
+        })
       })
-    })
-      .then(() => { wx.showToast({ title: '已发起完成，等待管理员确认' }); this.loadOrder(order._id) })
-      .catch(err => wx.showToast({ title: err.message || '操作失败', icon: 'none' }))
+      .then(() => {
+        wx.showToast({ title: '已发起完成，等待管理员确认' })
+        // 发起完成后，可以清理本地暂存
+        try { wx.removeStorageSync(DRAFT_KEY_PREFIX + order._id) } catch (e) {}
+        this.loadOrder(order._id)
+      })
+      .catch(err => {
+        wx.hideLoading()
+        wx.showToast({ title: err.message || '操作失败', icon: 'none' })
+      })
   },
-
-  // —— 客户端：确认完成（废弃）——
-  // confirmComplete() {
-  //   const { order, role, userId } = this.data
-  //   if (!order) return
-  //   if (role !== 'customer') {
-  //     wx.showToast({ title: '仅客户可确认完成', icon: 'none' }); return
-  //   }
-  //   if (order.status !== 'awaitingConfirm') {
-  //     wx.showToast({ title: '当前状态不可确认', icon: 'none' }); return
-  //   }
-  //   post(`/customer/${order._id}/complete-confirm`, { customerId: userId })
-  //     .then(() => {
-  //       wx.showToast({ title: '订单已完成' })
-  //       // 可选：完成后引导去评价
-  //       setTimeout(() => this.goReview(), 600)
-  //     })
-  //     .catch(err => wx.showToast({ title: err.message || '操作失败', icon: 'none' }))
-  // },
 
   // —— 客户端：取消订单（仅在 pending/offered 时显示）——
   async cancelOrder() {
@@ -275,49 +353,82 @@ Page({
 
   // —— 师傅端：查看用户评价（仅在已完成时展示按钮）——
   goTechViewReview() {
-  const { order, role } = this.data
-  if (!order || !order._id) return
-  if (role !== 'technician') {
-    wx.showToast({ title: '仅师傅可查看', icon: 'none' })
-    return
-  }
-  // 仅完成状态允许进入评价页
-  if (order.status !== 'done') {
-    wx.showToast({ title: '仅已完成的订单可查看评价', icon: 'none' })
-    return
-  }
-  wx.navigateTo({ url: `/pages/technician/review/review?id=${order._id}` })
-  },
-
-  chooseCheckinImage() {
-    const arr = this.data.checkinImages
-    if (arr.length >= 5) {
-      wx.showToast({ title: '最多上传 5 张', icon: 'none' })
+    const { order, role } = this.data
+    if (!order || !order._id) return
+    if (role !== 'technician') {
+      wx.showToast({ title: '仅师傅可查看', icon: 'none' })
       return
     }
-    wx.chooseImage({
-      count: 5 - arr.length,
-      sizeType: ['compressed'],
-      success: res => {
-        this.setData({ checkinImages: arr.concat(res.tempFilePaths) })
+    if (order.status !== 'done') {
+      wx.showToast({ title: '仅已完成的订单可查看评价', icon: 'none' })
+      return
+    }
+    wx.navigateTo({ url: `/pages/technician/review/review?id=${order._id}` })
+  },
+
+  // ★ 选择某个分类坑位的图片/视频
+  chooseCheckinMedia(e) {
+    const index = Number(e.currentTarget.dataset.index)
+    if (Number.isNaN(index)) return
+    const slots = this.data.checkinSlots
+    if (!slots || !slots[index]) return
+
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image', 'video'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        const file = res.tempFiles && res.tempFiles[0]
+        if (!file) return
+        const filePath = file.tempFilePath
+        const fileType = file.fileType || (filePath.endsWith('.mp4') ? 'video' : 'image')
+
+        const newSlots = slots.slice()
+        newSlots[index] = {
+          ...newSlots[index],
+          filePath,
+          fileType
+        }
+        this.setData({ checkinSlots: newSlots })
       }
     })
   },
 
-  // 预览签到图片
-  previewCheckin(e) {
-    const index = e.currentTarget.dataset.index
-    wx.previewImage({
-      current: this.data.checkinImages[index],
-      urls: this.data.checkinImages
-    })
+  // ★ 预览某个分类坑位的图片或视频
+  previewCheckinSlot(e) {
+    const index = Number(e.currentTarget.dataset.index)
+    if (Number.isNaN(index)) return
+    const slot = this.data.checkinSlots[index]
+    if (!slot || !slot.filePath) return
+
+    if (slot.fileType === 'video') {
+      // 简单做法：用内置的视频预览
+      wx.previewMedia({
+        sources: [{
+          url: slot.filePath,
+          type: 'video'
+        }]
+      })
+    } else {
+      wx.previewImage({
+        current: slot.filePath,
+        urls: [slot.filePath]
+      })
+    }
   },
 
-  // 删除签到图片
-  removeCheckin(e) {
-    const index = e.currentTarget.dataset.index
-    const arr = this.data.checkinImages.slice()
-    arr.splice(index, 1)
-    this.setData({ checkinImages: arr })
+  // ★ 删除某个分类坑位的媒资
+  removeCheckinSlot(e) {
+    const index = Number(e.currentTarget.dataset.index)
+    if (Number.isNaN(index)) return
+    const slots = this.data.checkinSlots.slice()
+    if (!slots[index]) return
+    slots[index] = {
+      ...slots[index],
+      filePath: '',
+      fileType: '',
+      uploadedUrl: ''
+    }
+    this.setData({ checkinSlots: slots })
   }
 })
