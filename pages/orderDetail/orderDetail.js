@@ -1,7 +1,7 @@
 // pages/orderDetail/orderDetail.js
 const { get, put, post } = require('../../utils/request')
 
-const statusMap = { pending: '待接单', assigned: '已接单', checkedIn: '已签到', awaitingConfirm: '待确认', done: '已完成', cancelled: '已取消' }
+const statusMap = { pending: '待接单', offered: '待接收', assigned: '已接单', checkedIn: '已签到', awaitingConfirm: '待确认', done: '已完成', cancelled: '已取消' }
 const CHECKIN_RADIUS_M = 200  // 你可以改为 300/500
 
 // 计算两点经纬度的哈弗辛距离（米）
