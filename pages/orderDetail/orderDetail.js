@@ -1,5 +1,5 @@
 // pages/orderDetail/orderDetail.js
-const { get, put, post } = require('../../utils/request')
+const { get, put, post, uploadimage } = require('../../utils/request')
 
 const statusMap = { pending: '待接单', offered: '待接收', assigned: '已接单', checkedIn: '已签到', awaitingConfirm: '待确认', done: '已完成', cancelled: '已取消' }
 const CHECKIN_RADIUS_M = 200  // 你可以改为 300/500
@@ -25,7 +25,8 @@ Page({
     userName: '',
     statusText: '',
     reviews: [],
-    hasMyReview: false
+    hasMyReview: false,
+    checkinImages: []
   },
 
   onLoad(options) {
@@ -207,8 +208,21 @@ Page({
     if (order.status !== 'checkedIn') {
       wx.showToast({ title: '需到场签到后才能发起完成', icon: 'none' }); return
     }
-    post(`/technicians/${order._id}/complete-request`, { technicianId: userId })
-      .then(() => { wx.showToast({ title: '已发起完成，等待客户确认' }); this.loadOrder(order._id) })
+    // ★ 必须上传签到照片
+    if (this.data.checkinImages.length < 5) {
+      wx.showToast({ title: '请上传 5 张签到照片', icon: 'none' })
+      return
+    }
+    const uploadTasks = this.data.checkinImages.map(p => uploadimage(p))
+
+    Promise.all(uploadTasks).then(urls => {
+      // 2) 调用发起完成接口，并把签到图放进去
+      return post(`/technicians/${order._id}/complete-request`, {
+        technicianId: userId,
+        checkinImages: urls    // ★ 发给后台
+      })
+    })
+      .then(() => { wx.showToast({ title: '已发起完成，等待管理员确认' }); this.loadOrder(order._id) })
       .catch(err => wx.showToast({ title: err.message || '操作失败', icon: 'none' }))
   },
 
@@ -260,18 +274,50 @@ Page({
   },
 
   // —— 师傅端：查看用户评价（仅在已完成时展示按钮）——
-   goTechViewReview() {
-    const { order, role } = this.data
-    if (!order || !order._id) return
-    if (role !== 'technician') {
-      wx.showToast({ title: '仅师傅可查看', icon: 'none' })
+  goTechViewReview() {
+  const { order, role } = this.data
+  if (!order || !order._id) return
+  if (role !== 'technician') {
+    wx.showToast({ title: '仅师傅可查看', icon: 'none' })
+    return
+  }
+  // 仅完成状态允许进入评价页
+  if (order.status !== 'done') {
+    wx.showToast({ title: '仅已完成的订单可查看评价', icon: 'none' })
+    return
+  }
+  wx.navigateTo({ url: `/pages/technician/review/review?id=${order._id}` })
+  },
+
+  chooseCheckinImage() {
+    const arr = this.data.checkinImages
+    if (arr.length >= 5) {
+      wx.showToast({ title: '最多上传 5 张', icon: 'none' })
       return
     }
-    // 仅完成状态允许进入评价页
-    if (order.status !== 'done') {
-      wx.showToast({ title: '仅已完成的订单可查看评价', icon: 'none' })
-      return
-    }
-    wx.navigateTo({ url: `/pages/technician/review/review?id=${order._id}` })
-    }
+    wx.chooseImage({
+      count: 5 - arr.length,
+      sizeType: ['compressed'],
+      success: res => {
+        this.setData({ checkinImages: arr.concat(res.tempFilePaths) })
+      }
+    })
+  },
+
+  // 预览签到图片
+  previewCheckin(e) {
+    const index = e.currentTarget.dataset.index
+    wx.previewImage({
+      current: this.data.checkinImages[index],
+      urls: this.data.checkinImages
+    })
+  },
+
+  // 删除签到图片
+  removeCheckin(e) {
+    const index = e.currentTarget.dataset.index
+    const arr = this.data.checkinImages.slice()
+    arr.splice(index, 1)
+    this.setData({ checkinImages: arr })
+  }
 })

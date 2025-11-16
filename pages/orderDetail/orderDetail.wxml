@@ -95,15 +95,35 @@
 
 <!-- 师傅端：发起完成（仅当已签到） -->
 <view wx:if="{{role==='technician'}}" class="section">
+<!-- ★★★ 签到照片上传区（师傅端，状态=已签到） -->
+  <view wx:if="{{role=='technician' && order.status=='checkedIn'}}" class="checkin-upload-box">
+
+    <view class="checkin-title">上传签到照片（需上传 5 张）</view>
+
+    <view class="checkin-images">
+      <block wx:for="{{checkinImages}}" wx:key="index">
+        <view class="img-item">
+          <image src="{{item}}" bindtap="previewCheckin" data-index="{{index}}"></image>
+          <view class="remove-btn" bindtap="removeCheckin" data-index="{{index}}">×</view>
+        </view>
+      </block>
+
+      <!-- 添加图片按钮 -->
+      <view class="img-add" wx:if="{{checkinImages.length < 5}}" bindtap="chooseCheckinImage">
+        <text>+</text>
+      </view>
+    </view>
+
+  </view>
   <button
     class="primary-btn"
     bindtap="requestComplete"
     wx:if="{{order.status==='checkedIn'}}"
-  >发起完成（待客户确认）</button>
+  >发起完成</button>
 
   <button
     class="primary-btn disabled"
-    wx:if="{{order.status!=='checkedIn' && order.status!=='done'}}"
+    wx:if="{{order.status!=='checkedIn' && order.status!=='done' && order.status!=='awaitingConfirm'}}"
     disabled="true"
   >需先到场签到后才能完成</button>
 </view>
@@ -115,7 +135,7 @@
 
 <!-- 状态提示（可选）：展示“待确认” -->
 <view wx:if="{{order.status==='awaitingConfirm'}}" class="hint">
-  订单已由师傅发起完成，等待客户确认
+  订单已由师傅发起完成，等待管理员确认
   <text class="sub">（确认后即可去评价）</text>
 </view>
 
