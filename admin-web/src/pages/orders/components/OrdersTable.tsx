@@ -8,6 +8,7 @@ interface Props {
   assigningId?: string | null;
   onAssignClick: (row: Order) => void;
   onStatusClick: (row: Order) => void;
+  onCompleteReview: (row: Order) => void;
 }
 
 const th: React.CSSProperties = {
@@ -25,7 +26,13 @@ const td: React.CSSProperties = {
   verticalAlign: 'top',
 };
 
-export default function OrdersTable({ data, assigningId, onAssignClick, onStatusClick  }: Props) {
+export default function OrdersTable({
+  data,
+  assigningId,
+  onAssignClick,
+  onStatusClick,
+  onCompleteReview,
+}: Props) {
   // 全屏预览
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerImages, setViewerImages] = useState<string[]>([]);
@@ -237,6 +244,23 @@ export default function OrdersTable({ data, assigningId, onAssignClick, onStatus
                 >
                   修改状态
                 </button>
+                {/* 仅在 “待完成审核” 状态下显示完成审核按钮 */}
+                {row.status === 'awaitingConfirm' && (
+                  <button
+                    onClick={() => onCompleteReview(row)}
+                    style={{
+                      marginLeft: 6,
+                      padding: '6px 10px',
+                      borderRadius: 6,
+                      border: '1px solid #e5e7eb',
+                      background: '#111827',
+                      color: '#fff',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    完成审核
+                  </button>
+                )}
               </td>
             </tr>
           ))}

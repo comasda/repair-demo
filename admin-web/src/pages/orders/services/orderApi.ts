@@ -81,3 +81,13 @@ export async function exportOrders(params?: ExportParams) {
   a.remove();
   URL.revokeObjectURL(url);
 }
+
+// ★ 管理员：审核通过订单完成申请
+export function approveOrderComplete(orderId: string) {
+  return http.post(`/admin/orders/${orderId}/complete-approve`);
+}
+
+// ★ 管理员：驳回完成申请（可带理由）
+export function rejectOrderComplete(orderId: string, reason: string) {
+  return http.post(`/admin/orders/${orderId}/complete-reject`, { reason });
+}

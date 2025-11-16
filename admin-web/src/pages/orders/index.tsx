@@ -3,6 +3,7 @@ import { useOrders } from './hooks/useOrders';
 import OrdersTable from './components/OrdersTable';
 import StatusModal from './components/StatusModal';
 import AssignModal from './components/AssignModal';
+import CompleteReviewModal from './components/CompleteReviewModal';
 import type { Order } from './types';
 import { exportOrders } from './services/orderApi';
 
@@ -12,6 +13,7 @@ export default function OrdersPage() {
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
   const [statusModalVisible, setStatusModalVisible] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [completeReviewVisible, setCompleteReviewVisible] = useState(false);
 
   // ✅ 登录检查：若无 token，提示并跳回登录页
   useEffect(() => {
@@ -34,6 +36,16 @@ export default function OrdersPage() {
   async function confirmStatusChange() {
     await load(); // 刷新订单列表
     setStatusModalVisible(false);
+  }
+
+  function openCompleteReview(order: Order) {
+    setCurrentOrder(order);
+    setCompleteReviewVisible(true);
+  }
+
+  async function handleCompleteReviewOk() {
+    setCompleteReviewVisible(false);
+    await load(); // 审核操作在弹窗里完成，这里只负责刷新
   }
 
   async function confirmAssign(technicianId: string, technicianName: string) {
@@ -96,10 +108,11 @@ export default function OrdersPage() {
 
       {/* 表格 */}
       <OrdersTable
-        data={orders || []}
-        assigningId={assigningId}
-        onAssignClick={openAssign}
-        onStatusClick={openStatusModal}
+      data={orders || []}
+      assigningId={assigningId}
+      onAssignClick={openAssign}
+      onStatusClick={openStatusModal}
+      onCompleteReview={openCompleteReview}
       />
 
       {/* 指派弹窗 */}
@@ -115,6 +128,14 @@ export default function OrdersPage() {
         order={currentOrder}
         onOk={confirmStatusChange}
         onCancel={() => setStatusModalVisible(false)}
+      />
+
+      {/* 完成审核弹窗 */}
+      <CompleteReviewModal
+        visible={completeReviewVisible}
+        order={currentOrder}
+        onOk={handleCompleteReviewOk}
+        onCancel={() => setCompleteReviewVisible(false)}
       />
     </div>
   );
