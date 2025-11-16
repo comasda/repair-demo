@@ -18,6 +18,7 @@ export interface Order {
   phone?: string;
   address?: string;
   images?: string[];
+  checkinImages?: string[];
   time?: string;
   status: OrderStatus;
   technicianId?: string | null;

@@ -55,10 +55,11 @@ export default function OrdersTable({ data, assigningId, onAssignClick, onStatus
             <th style={th}>客户</th>
             <th style={th}>设备</th>
             <th style={th}>故障</th>
-            <th style={th}>图片</th>
+            <th style={th}>客户图片</th>
             <th style={th}>地址</th>
             <th style={th}>状态</th>
             <th style={th}>技师</th>
+            <th style={th}>签到图片</th>
             <th style={th}>创建时间</th>
             <th style={th}>操作</th>
           </tr>
@@ -66,7 +67,7 @@ export default function OrdersTable({ data, assigningId, onAssignClick, onStatus
         <tbody>
           {data.length === 0 && (
             <tr>
-              <td colSpan={10} style={{ padding: 16, textAlign: 'center', color: '#999' }}>
+              <td colSpan={11} style={{ padding: 16, textAlign: 'center', color: '#999' }}>
                 暂无数据
               </td>
             </tr>
@@ -142,6 +143,70 @@ export default function OrdersTable({ data, assigningId, onAssignClick, onStatus
               <td style={td}>{row.address ?? '-'}</td>
               <td style={td}><StatusBadge s={row.status} /></td>
               <td style={td}>{row.technicianName || row.technicianId || '-'}</td>
+              {/* 新增：签到图片 checkinImages 列 */}
+              <td style={td}>
+                {Array.isArray(row.checkinImages) && row.checkinImages.length > 0 ? (
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', maxWidth: 140 }}>
+                    {row.checkinImages.slice(0, 3).map((src: string, i: number) => (
+                      <div
+                        key={i}
+                        title="点击查看大图"
+                        onClick={() => openViewer(row.checkinImages as string[], i)}
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 6,
+                          overflow: 'hidden',
+                          border: '1px solid #e5e7eb',
+                          background: '#f3f4f6',
+                          cursor: 'pointer',
+                          position: 'relative',
+                        }}
+                        onMouseEnter={(e) => {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setTooltip({
+                            visible: true,
+                            src,
+                            left: rect.right + 8,
+                            top: rect.top
+                          });
+                        }}
+                        onMouseMove={(e) => {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setTooltip(t => ({
+                            ...t,
+                            left: rect.right + 8,
+                            top: rect.top
+                          }));
+                        }}
+                        onMouseLeave={() => setTooltip(prev => ({ ...prev, visible: false }))}                        
+                      >
+                        <img
+                          src={src}
+                          loading="lazy"
+                          alt=""
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                        />
+                      </div>
+                    ))}
+                      {/* 若多于 3 张显示 +N */}
+                    {row.checkinImages.length > 3 && (
+                      <div
+                        style={{
+                          width: 40, height: 40, borderRadius: 6,
+                          border: '1px solid #e5e7eb',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 12, color: '#374151', background: '#fff'
+                        }}
+                      >
+                        +{row.checkinImages.length - 3}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <span style={{ color: '#9ca3af' }}>—</span>
+                )}
+              </td>              
               <td style={td}>{row.time || row.createdAt || '-'}</td>
               <td style={td}>
                 <button
