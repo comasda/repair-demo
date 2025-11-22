@@ -4,8 +4,9 @@ import OrdersTable from './components/OrdersTable';
 import StatusModal from './components/StatusModal';
 import AssignModal from './components/AssignModal';
 import CompleteReviewModal from './components/CompleteReviewModal';
-import type { Order } from './types';
+import type { Order, CheckinMedia } from './types';
 import { exportOrders } from './services/orderApi';
+import CheckinMediaModal from './components/CheckinMediaModal';
 
 export default function OrdersPage() {
   const { orders, loading, status, setStatus, load, handleAssign, assigningId } = useOrders();
@@ -14,6 +15,8 @@ export default function OrdersPage() {
   const [statusModalVisible, setStatusModalVisible] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [completeReviewVisible, setCompleteReviewVisible] = useState(false);
+  const [checkinMediaVisible, setCheckinMediaVisible] = useState(false);
+  const [checkinMedia, setCheckinMedia] = useState<CheckinMedia | null>(null);
 
   // ✅ 登录检查：若无 token，提示并跳回登录页
   useEffect(() => {
@@ -41,6 +44,11 @@ export default function OrdersPage() {
   function openCompleteReview(order: Order) {
     setCurrentOrder(order);
     setCompleteReviewVisible(true);
+  }
+
+  function openCheckinMedia(order: Order) {
+    setCheckinMedia(order.checkinMedia || null);
+    setCheckinMediaVisible(true);
   }
 
   async function handleCompleteReviewOk() {
@@ -113,6 +121,7 @@ export default function OrdersPage() {
       onAssignClick={openAssign}
       onStatusClick={openStatusModal}
       onCompleteReview={openCompleteReview}
+      onViewCheckinMedia={openCheckinMedia}
       />
 
       {/* 指派弹窗 */}
@@ -136,6 +145,13 @@ export default function OrdersPage() {
         order={currentOrder}
         onOk={handleCompleteReviewOk}
         onCancel={() => setCompleteReviewVisible(false)}
+      />
+
+      {/* 查看签到佐证 Modal */}
+      <CheckinMediaModal
+        visible={checkinMediaVisible}
+        media={checkinMedia}
+        onClose={() => setCheckinMediaVisible(false)}
       />
     </div>
   );

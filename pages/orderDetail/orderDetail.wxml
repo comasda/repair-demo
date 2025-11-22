@@ -91,11 +91,8 @@
 <!-- 师傅端：到场签到（仅已接单且是当前师傅本人） -->
 <button wx:if="{{role==='technician' && order.status==='assigned' && order.technicianId===userId}}"
         type="primary" bindtap="checkin">到场签到</button>
-</view>
 
-<!-- 师傅端：发起完成（仅当已签到） -->
-<view wx:if="{{role==='technician'}}" class="section">
-<!-- 师傅端：签到后上传分类图片/视频 -->
+<!-- 师傅端：签到后上传分类图片/视频（仅当已签到） -->
 <view wx:if="{{role === 'technician' && order && order.status === 'checkedIn'}}" class="checkin-section">
   <view class="section-title">到场佐证（图片或视频）</view>
 
@@ -107,43 +104,52 @@
 
       <view class="slot-tips">{{item.tips}}</view>
 
-      <view class="slot-body">
-        <!-- 已选择文件 -->
-        <view wx:if="{{item.filePath}}">
-          <image
-            wx:if="{{item.fileType === 'image'}}"
-            src="{{item.filePath}}"
-            class="slot-media"
-            mode="aspectFill"
-            bindtap="previewCheckinSlot"
-            data-index="{{index}}"
-          />
-          <video
-            wx:elif="{{item.fileType === 'video'}}"
-            src="{{item.filePath}}"
-            class="slot-media"
-            controls
-          ></video>
+      <!-- 已选择的文件列表（图片或视频，可多张） -->
+      <view class="slot-files" wx:if="{{item.files && item.files.length}}">
+        <block wx:for="{{item.files}}" wx:for-item="file" wx:for-index="fileIndex" wx:key="filePath">
+          <view class="slot-file">
+            <!-- 图片预览 -->
+            <image
+              wx:if="{{file.fileType === 'image'}}"
+              src="{{file.filePath}}"
+              class="slot-media"
+              mode="aspectFill"
+              bindtap="previewCheckinSlot"
+              data-index="{{index}}"
+              data-file-index="{{fileIndex}}"
+            />
+            <!-- 视频预览 -->
+            <video
+              wx:elif="{{file.fileType === 'video'}}"
+              id="video_{{index}}_{{fileIndex}}"
+              src="{{file.filePath}}"
+              class="slot-media"
+              controls
+              bindtap="previewVideo"
+              bindfullscreenchange="onVideoFullScreenChange"
+            ></video>
 
-          <button
-            class="slot-remove-btn"
-            bindtap="removeCheckinSlot"
-            data-index="{{index}}"
-          >
-            删除
-          </button>
-        </view>
+            <!-- 删除当前文件 -->
+            <view
+              class="slot-remove-btn"
+              bindtap="removeCheckinSlot"
+              data-index="{{index}}"
+              data-file-index="{{fileIndex}}"
+            >
+              删除
+            </view>
+          </view>
+        </block>
+      </view>
 
-        <!-- 未选择文件 -->
-        <view
-          wx:else
-          class="slot-uploader"
-          bindtap="chooseCheckinMedia"
-          data-index="{{index}}"
-        >
-          <text class="slot-uploader-plus">＋</text>
-          <text class="slot-uploader-text">点击上传 {{item.label}}</text>
-        </view>
+      <!-- 上传按钮（始终显示，数量由 JS 限制） -->
+      <view
+        class="slot-uploader"
+        bindtap="chooseCheckinMedia"
+        data-index="{{index}}"
+      >
+        <text class="slot-uploader-plus">＋</text>
+        <text class="slot-uploader-text">点击上传 {{item.label}}</text>
       </view>
     </view>
   </block>

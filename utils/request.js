@@ -64,6 +64,7 @@ const uploadimage = (filePath) => {
       name: 'file',
       header: token ? { Authorization: `Bearer ${token}` } : {},
       success(res) {
+        console.log('upload raw res', res);
         try {
           const data = JSON.parse(res.data || '{}')
           if (data && data.url) return resolve(data.url)

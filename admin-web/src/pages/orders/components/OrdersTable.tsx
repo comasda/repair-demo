@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import StatusBadge from './StatusBadge';
 import type { Order } from '../types';
-import ImageViewer from './ImageViewer';
+import MediaViewer from './MediaViewer';
+
+const isVideoAsset = (url: string) => /\.(mp4|mov|webm|ogg|m4v)$/i.test(url || '');
 
 interface Props {
   data: Order[];
@@ -9,6 +11,7 @@ interface Props {
   onAssignClick: (row: Order) => void;
   onStatusClick: (row: Order) => void;
   onCompleteReview: (row: Order) => void;
+  onViewCheckinMedia: (row: Order) => void;
 }
 
 const th: React.CSSProperties = {
@@ -32,26 +35,123 @@ export default function OrdersTable({
   onAssignClick,
   onStatusClick,
   onCompleteReview,
+  onViewCheckinMedia,
 }: Props) {
   // 全屏预览
-  const [viewerOpen, setViewerOpen] = useState(false);
-  const [viewerImages, setViewerImages] = useState<string[]>([]);
+  const [viewerVisible, setViewerVisible] = useState(false);
+  const [viewerItems, setViewerItems] = useState<{ url: string; type: 'image' | 'video' }[]>([]);
   const [viewerIndex, setViewerIndex] = useState(0);
+  const [tooltip, setTooltip] = useState<{
+    visible: boolean;
+    src: string;
+    left: number;
+    top: number;
+    type: 'image' | 'video';
+  }>({ visible: false, src: '', left: 0, top: 0, type: 'image' });
   const openViewer = (images: string[], idx: number) => {
-    setViewerImages(images);
+    setViewerItems(images.map((url) => ({ url, type: isVideoAsset(url) ? 'video' : 'image' })));
     setViewerIndex(idx);
-    setViewerOpen(true);
-    // 打开全屏时，确保悬浮预览消失
-    setTooltip(prev => ({ ...prev, visible: false }));
+    setViewerVisible(true);
+    setTooltip((prev) => ({ ...prev, visible: false }));
   };
-  const closeViewer = () => setViewerOpen(false);
-  const prevViewer = () => setViewerIndex(i => (i - 1 + viewerImages.length) % viewerImages.length);
-  const nextViewer = () => setViewerIndex(i => (i + 1) % viewerImages.length);
 
-  // 悬浮放大预览（160x160，跟随鼠标元素右侧）
-  const [tooltip, setTooltip] = useState<{visible: boolean; src: string; left: number; top: number}>({
-    visible: false, src: '', left: 0, top: 0
+  const renderThumbContent = (src: string) => {
+    if (isVideoAsset(src)) {
+      return (
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            background: '#050b16',
+            color: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 16,
+            letterSpacing: 1,
+          }}
+        >
+          ▶
+        </div>
+      );
+    }
+    return (
+      <img
+        src={src}
+        loading="lazy"
+        alt=""
+        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+      />
+    );
+  };
+
+  const updateTooltipPosition = (rect: DOMRect) => ({
+    left: rect.right + 8,
+    top: rect.top,
   });
+
+  const handleThumbMouseEnter = (src: string) => (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setTooltip({
+      visible: true,
+      src,
+      ...updateTooltipPosition(rect),
+      type: isVideoAsset(src) ? 'video' : 'image',
+    });
+  };
+
+  const handleThumbMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setTooltip((prev) => ({ ...prev, ...updateTooltipPosition(rect) }));
+  };
+
+  const handleThumbMouseLeave = () => setTooltip((prev) => ({ ...prev, visible: false }));
+
+  const renderThumbStack = (images: string[]) => (
+    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', maxWidth: 140 }}>
+      {images.slice(0, 3).map((src, i) => (
+        <div
+          key={i}
+          title="点击查看大图"
+          onClick={() => openViewer(images, i)}
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 6,
+            overflow: 'hidden',
+            border: '1px solid #e5e7eb',
+            background: '#f3f4f6',
+            cursor: 'pointer',
+            position: 'relative',
+          }}
+          onMouseEnter={handleThumbMouseEnter(src)}
+          onMouseMove={handleThumbMouseMove}
+          onMouseLeave={handleThumbMouseLeave}
+        >
+          {renderThumbContent(src)}
+        </div>
+      ))}
+      {images.length > 3 && (
+        <div
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 6,
+            border: '1px solid #e5e7eb',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 12,
+            color: '#374151',
+            background: '#fff',
+          }}
+        >
+          +{images.length - 3}
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <>
     <div style={{ overflowX: 'auto' }}>
@@ -87,62 +187,7 @@ export default function OrdersTable({
               <td style={td}>{row.issue ?? '-'}</td>
               <td style={td}>
                 {Array.isArray(row.images) && row.images.length > 0 ? (
-                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', maxWidth: 140 }}>
-                    {row.images.slice(0, 3).map((src: string, i: number) => (
-                      <div
-                        key={i}
-                        title="点击查看大图"
-                        onClick={() => openViewer(row.images as string[], i)}
-                        style={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: 6,
-                          overflow: 'hidden',
-                          border: '1px solid #e5e7eb',
-                          background: '#f3f4f6',
-                          cursor: 'pointer',
-                          position: 'relative',
-                        }}
-                        onMouseEnter={(e) => {
-                          const rect = e.currentTarget.getBoundingClientRect();
-                          setTooltip({
-                            visible: true,
-                            src,
-                            left: rect.right + 8,
-                            top: rect.top
-                          });
-                        }}
-                        onMouseMove={(e) => {
-                          const rect = e.currentTarget.getBoundingClientRect();
-                          setTooltip(t => ({
-                            ...t,
-                            left: rect.right + 8,
-                            top: rect.top
-                          }));
-                        }}
-                        onMouseLeave={() => setTooltip(prev => ({ ...prev, visible: false }))}                        
-                      >
-                        <img
-                          src={src}
-                          loading="lazy"
-                          alt=""
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                        />
-                      </div>
-                    ))}
-                    {row.images.length > 3 && (
-                      <div
-                        style={{
-                          width: 40, height: 40, borderRadius: 6,
-                          border: '1px solid #e5e7eb',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 12, color: '#374151', background: '#fff'
-                        }}
-                      >
-                        +{row.images.length - 3}
-                      </div>
-                    )}
-                  </div>
+                  renderThumbStack(row.images as string[])
                 ) : (
                   <span style={{ color: '#9ca3af' }}>—</span>
                 )}
@@ -153,66 +198,28 @@ export default function OrdersTable({
               {/* 新增：签到图片 checkinImages 列 */}
               <td style={td}>
                 {Array.isArray(row.checkinImages) && row.checkinImages.length > 0 ? (
-                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', maxWidth: 140 }}>
-                    {row.checkinImages.slice(0, 3).map((src: string, i: number) => (
-                      <div
-                        key={i}
-                        title="点击查看大图"
-                        onClick={() => openViewer(row.checkinImages as string[], i)}
-                        style={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: 6,
-                          overflow: 'hidden',
-                          border: '1px solid #e5e7eb',
-                          background: '#f3f4f6',
-                          cursor: 'pointer',
-                          position: 'relative',
-                        }}
-                        onMouseEnter={(e) => {
-                          const rect = e.currentTarget.getBoundingClientRect();
-                          setTooltip({
-                            visible: true,
-                            src,
-                            left: rect.right + 8,
-                            top: rect.top
-                          });
-                        }}
-                        onMouseMove={(e) => {
-                          const rect = e.currentTarget.getBoundingClientRect();
-                          setTooltip(t => ({
-                            ...t,
-                            left: rect.right + 8,
-                            top: rect.top
-                          }));
-                        }}
-                        onMouseLeave={() => setTooltip(prev => ({ ...prev, visible: false }))}                        
-                      >
-                        <img
-                          src={src}
-                          loading="lazy"
-                          alt=""
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                        />
-                      </div>
-                    ))}
-                      {/* 若多于 3 张显示 +N */}
-                    {row.checkinImages.length > 3 && (
-                      <div
-                        style={{
-                          width: 40, height: 40, borderRadius: 6,
-                          border: '1px solid #e5e7eb',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 12, color: '#374151', background: '#fff'
-                        }}
-                      >
-                        +{row.checkinImages.length - 3}
-                      </div>
-                    )}
-                  </div>
+                  renderThumbStack(row.checkinImages as string[])
                 ) : (
                   <span style={{ color: '#9ca3af' }}>—</span>
                 )}
+                {!!row.checkinMedia && (
+                  <button
+                    onClick={() => onViewCheckinMedia(row)}
+                    style={{
+                      display: 'block',
+                      marginTop: 6,
+                      padding: '4px 8px',
+                      background: '#111827',
+                      color: '#fff',
+                      fontSize: 12,
+                      borderRadius: 6,
+                      cursor: 'pointer',
+                      border: '1px solid #e5e7eb'
+                    }}
+                  >
+                    查看佐证
+                  </button>
+                )}                
               </td>              
               <td style={td}>{row.time || row.createdAt || '-'}</td>
               <td style={td}>
@@ -283,28 +290,43 @@ export default function OrdersTable({
           boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
         }}
       >
-        <img
-          src={tooltip.src}
-          alt=""
-          style={{
-            width: 160,
-            height: 160,
-            objectFit: 'cover',
-            borderRadius: 6,
-            display: 'block',
-          }}
-        />
+        {tooltip.type === 'video' ? (
+          <video
+            src={tooltip.src}
+            muted
+            autoPlay
+            loop
+            playsInline
+            style={{
+              width: 160,
+              height: 160,
+              objectFit: 'cover',
+              borderRadius: 6,
+              display: 'block',
+            }}
+          />
+        ) : (
+          <img
+            src={tooltip.src}
+            alt=""
+            style={{
+              width: 160,
+              height: 160,
+              objectFit: 'cover',
+              borderRadius: 6,
+              display: 'block',
+            }}
+          />
+        )}
       </div>
     )}
 
     {/* 全屏图片查看器（支持滚轮缩放） */}
-    <ImageViewer
-      visible={viewerOpen}
-      images={viewerImages}
-      index={viewerIndex}
-      onClose={closeViewer}
-      onPrev={prevViewer}
-      onNext={nextViewer}
+    <MediaViewer
+      visible={viewerVisible}
+      items={viewerItems}
+      initialIndex={viewerIndex}
+      onClose={() => setViewerVisible(false)}
     />
     </>
   );

@@ -8,6 +8,19 @@ export type OrderStatus =
   | 'done'
   | 'cancelled'
 
+export interface CheckinMediaItem {
+  url: string;
+  type: 'image' | 'video';
+}
+
+export interface CheckinMedia {
+  front?: CheckinMediaItem[];
+  circuit?: CheckinMediaItem[];
+  qrcode?: CheckinMediaItem[];
+  site?: CheckinMediaItem[];
+  finish?: CheckinMediaItem[];
+}
+
 export interface Order {
   _id: string;
   id?: string;
@@ -19,6 +32,7 @@ export interface Order {
   address?: string;
   images?: string[];
   checkinImages?: string[];
+  checkinMedia?: CheckinMedia | null;
   time?: string;
   status: OrderStatus;
   technicianId?: string | null;

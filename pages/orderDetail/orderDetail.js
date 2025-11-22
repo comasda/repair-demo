@@ -21,6 +21,15 @@ const CHECKIN_SLOTS = [
   { key: 'finish',  label: '维修完成图片', tips: '请上传维修完成后的照片' }
 ]
 
+// ★ 每个类别最多允许多少个文件（图片/视频）
+const CHECKIN_SLOT_LIMIT = {
+  front:  3,
+  circuit: 3,
+  qrcode: 3,
+  site:   3,
+  finish: 3,
+};
+
 const DRAFT_KEY_PREFIX = 'checkinDraft:'
 
 // 计算两点经纬度的哈弗辛距离（米）
@@ -46,15 +55,16 @@ Page({
     reviews: [],
     hasMyReview: false,
 
-    // ★ 五个分类坑位，每个坑位允许 1 个图片或视频
+    // ★ 五个分类坑位，每个坑位允许多个图片或视频
     checkinSlots: CHECKIN_SLOTS.map(s => ({
       key: s.key,
       label: s.label,
       tips: s.tips,
-      filePath: '',   // 本地临时路径（图片或视频）
-      fileType: '',   // image | video
-      uploadedUrl: '' // 预留：如果后面要做断点续传可以用
-    }))
+      files: []  // [{ filePath, fileType }]
+    })),
+
+    // 视频是否处于全屏状态（用于避免拦截返回/暂停）
+    videoFullScreen: false
   },
 
   onLoad(options) {
@@ -253,9 +263,7 @@ Page({
             key: s.key,
             label: s.label,
             tips: s.tips,
-            filePath: '',
-            fileType: '',
-            uploadedUrl: ''
+            files: []
           }))
         })
       }
@@ -275,45 +283,64 @@ Page({
       wx.showToast({ title: '需到场签到后才能发起完成', icon: 'none' }); return
     }
 
-    // ★ 校验 5 个分类坑位都已上传
-    const missingIndex = checkinSlots.findIndex(s => !s.filePath)
-    if (missingIndex !== -1) {
-      const slot = CHECKIN_SLOTS[missingIndex]
-      wx.showToast({ title: `请先上传：${slot.label}`, icon: 'none' })
+    // 校验 5 个分类坑位都已达到最小数量
+    const missingSlot = checkinSlots.find((slot) => {
+      const files = slot.files || []
+      const limit = CHECKIN_SLOT_LIMIT[slot.key] || 1
+      const min = 1  // 也可以单独配一个 CHECKIN_SLOT_MIN
+      return files.length < min
+    })
+
+    if (missingSlot) {
+      wx.showToast({ title: `请先上传：${missingSlot.label}`, icon: 'none' })
       return
     }
-
-    const localPaths = checkinSlots.map(s => s.filePath)
+    // 把所有文件展开成一个一维数组上传
+    const localFiles = []
+    checkinSlots.forEach(slot => {
+      (slot.files || []).forEach(f => {
+        localFiles.push({
+          slotKey: slot.key,
+          fileType: f.fileType,
+          filePath: f.filePath
+        })
+      })
+    })
 
     wx.showLoading({ title: '正在上传...', mask: true })
-    const uploadTasks = localPaths.map(p => uploadimage(p))
+    const uploadTasks = localFiles.map(item => uploadimage(item.filePath))
 
     Promise.all(uploadTasks)
       .then(urls => {
         wx.hideLoading()
-        // ★ 兼容后端：仍然传 checkinImages（数组），保持顺序
+
+        // 兼容旧字段：一维数组（按上传顺序）
         const checkinImages = urls
 
-        // ★ 额外带一份带分类的信息（后端现在即使忽略也没关系）
+        // 新字段：按类别整理
         const checkinMedia = {}
+        CHECKIN_SLOTS.forEach(s => { checkinMedia[s.key] = [] })
+
         urls.forEach((url, idx) => {
-          const slotMeta = CHECKIN_SLOTS[idx]
-          const slot = checkinSlots[idx]
-          checkinMedia[slotMeta.key] = {
-            url,
-            type: slot.fileType || 'image'
+          const info = localFiles[idx]
+          if (!info) return
+          if (!checkinMedia[info.slotKey]) {
+            checkinMedia[info.slotKey] = []
           }
+          checkinMedia[info.slotKey].push({
+            url,
+            type: info.fileType || 'image'
+          })
         })
 
         return post(`/technicians/${order._id}/complete-request`, {
           technicianId: userId,
           checkinImages,
-          checkinMedia   // 后端改造时可用
+          checkinMedia
         })
       })
       .then(() => {
         wx.showToast({ title: '已发起完成，等待管理员确认' })
-        // 发起完成后，可以清理本地暂存
         try { wx.removeStorageSync(DRAFT_KEY_PREFIX + order._id) } catch (e) {}
         this.loadOrder(order._id)
       })
@@ -373,21 +400,37 @@ Page({
     const slots = this.data.checkinSlots
     if (!slots || !slots[index]) return
 
+    const slot = slots[index]
+    const key = slot.key
+    const limit = CHECKIN_SLOT_LIMIT[key] || 1
+    const currentCount = (slot.files || []).length
+    const canAdd = limit - currentCount
+
+    if (canAdd <= 0) {
+      wx.showToast({ title: `「${slot.label}」最多只能上传 ${limit} 个`, icon: 'none' })
+      return
+    }
+
     wx.chooseMedia({
-      count: 1,
+      count: canAdd,  // ✅ 一次最多还能选几个
       mediaType: ['image', 'video'],
       sourceType: ['album', 'camera'],
       success: (res) => {
-        const file = res.tempFiles && res.tempFiles[0]
-        if (!file) return
-        const filePath = file.tempFilePath
-        const fileType = file.fileType || (filePath.endsWith('.mp4') ? 'video' : 'image')
+        const files = res.tempFiles || []
+        if (!files.length) return
 
         const newSlots = slots.slice()
+        const existFiles = newSlots[index].files || []
+
+        const appended = files.map(file => {
+          const filePath = file.tempFilePath
+          const fileType = file.fileType || (filePath.endsWith('.mp4') ? 'video' : 'image')
+          return { filePath, fileType }
+        })
+
         newSlots[index] = {
           ...newSlots[index],
-          filePath,
-          fileType
+          files: existFiles.concat(appended).slice(0, limit) // 再保险一下截断到上限
         }
         this.setData({ checkinSlots: newSlots })
       }
@@ -396,39 +439,64 @@ Page({
 
   // ★ 预览某个分类坑位的图片或视频
   previewCheckinSlot(e) {
-    const index = Number(e.currentTarget.dataset.index)
-    if (Number.isNaN(index)) return
-    const slot = this.data.checkinSlots[index]
-    if (!slot || !slot.filePath) return
+    const slotIndex = Number(e.currentTarget.dataset.index)
+    const fileIndex = Number(e.currentTarget.dataset.fileIndex || 0)
+    if (Number.isNaN(slotIndex)) return
+    const slot = this.data.checkinSlots[slotIndex]
+    if (!slot || !slot.files || !slot.files.length) return
 
-    if (slot.fileType === 'video') {
-      // 简单做法：用内置的视频预览
-      wx.previewMedia({
-        sources: [{
-          url: slot.filePath,
-          type: 'video'
-        }]
-      })
-    } else {
-      wx.previewImage({
-        current: slot.filePath,
-        urls: [slot.filePath]
-      })
+    const file = slot.files[fileIndex]
+    if (!file || !file.filePath) return
+
+    // 视频预览交给 <video> 的 previewVideo 事件，这里只处理图片
+    if (file.fileType === 'video') {
+      return
     }
+
+    wx.previewImage({
+      current: file.filePath,
+      urls: slot.files
+        .filter(f => f.fileType === 'image')
+        .map(f => f.filePath)
+    })
   },
 
   // ★ 删除某个分类坑位的媒资
   removeCheckinSlot(e) {
-    const index = Number(e.currentTarget.dataset.index)
-    if (Number.isNaN(index)) return
+    const slotIndex = Number(e.currentTarget.dataset.index)
+    const fileIndex = Number(e.currentTarget.dataset.fileIndex || 0)
+    if (Number.isNaN(slotIndex)) return
     const slots = this.data.checkinSlots.slice()
-    if (!slots[index]) return
-    slots[index] = {
-      ...slots[index],
-      filePath: '',
-      fileType: '',
-      uploadedUrl: ''
+    const slot = slots[slotIndex]
+    if (!slot || !slot.files || !slot.files.length) return
+
+    const files = slot.files.slice()
+    files.splice(fileIndex, 1)  // 删除对应那一张
+
+    slots[slotIndex] = {
+      ...slot,
+      files
     }
     this.setData({ checkinSlots: slots })
-  }
+  },
+
+  // ★ 预览视频：点击小窗 → 进入全屏，交给系统控件控制播放/暂停/返回
+  previewVideo(e) {
+    const { videoFullScreen } = this.data
+    const id = e.currentTarget.id
+    if (!id) return
+
+    // 如果当前已经是全屏状态，就不要再拦截点击
+    if (videoFullScreen) return
+
+    const ctx = wx.createVideoContext(id, this)
+    // 只负责切换到全屏，不自动 play，避免和暂停按钮冲突
+    ctx.requestFullScreen({ direction: 0 }) // 0 竖屏，90 横屏
+  },
+
+  // ★ 监听视频全屏状态变化（进入/退出）
+  onVideoFullScreenChange(e) {
+    const full = !!(e.detail && e.detail.fullScreen)
+    this.setData({ videoFullScreen: full })
+  },
 })
