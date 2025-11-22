@@ -1,8 +1,19 @@
 import React, { useEffect, useState } from 'react';
+import io from 'socket.io-client';
 import { auth } from './store/auth';
 import OrdersPage from './pages/orders';
 import TechnicianReviewPage from './pages/technicians';
 import CustomerReviewPage from './pages/customers';
+
+// 定义新订单通知的数据结构
+interface NewOrderNotification {
+  orderId: string;
+  device: string;
+  issue: string;
+  customer: string;
+  time: string;
+  status: string;
+}
 
 // 简单判断是否已登录（存在 token 即视为已登录）
 const isAuthed = () => Boolean(localStorage.getItem('token'));
@@ -65,11 +76,72 @@ function LoginPage({ onLogin }: { onLogin: () => void }) {
 export default function App() {
   const [authed, setAuthed] = useState(isAuthed());
   const [tab, setTab] = useState<'orders' | 'techs' | 'customers'>('orders'); // 👈 当前页
+  const [socket, setSocket] = useState<any>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     setAuthed(Boolean(token));
+
+    // 建立 Socket.IO 连接 - 连接到后端服务器
+    // 可以通过环境变量或配置来指定后端地址
+    const backendUrl = (import.meta.env as any).VITE_BACKEND_URL || 'https://www.lihewasher.com';
+    const newSocket = io(backendUrl, {
+      path: '/socket.io',
+      transports: ['polling', 'websocket'], // 优先使用轮询
+      timeout: 20000, // 20秒超时
+      forceNew: true
+    });
+    setSocket(newSocket);
+
+    // 监听连接事件
+    newSocket.on('connect', () => {
+    });
+
+    newSocket.on('connect_error', (error: any) => {
+    });
+
+    newSocket.on('disconnect', (reason: any) => {
+    });
+
+    // 监听新订单通知
+    newSocket.on('new_order', (data: NewOrderNotification) => {
+      // 显示浏览器原生通知（如果用户允许）
+      if (Notification.permission === 'granted') {
+        new Notification('新订单提醒', {
+          body: `设备: ${data.device}\n问题: ${data.issue}\n客户: ${data.customer}`,
+          icon: '/favicon.ico' // 可以替换为您的应用图标
+        });
+      } else if (Notification.permission !== 'denied') {
+        // 请求通知权限
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            new Notification('新订单提醒', {
+              body: `设备: ${data.device}\n问题: ${data.issue}\n客户: ${data.customer}`,
+              icon: '/favicon.ico'
+            });
+          }
+        });
+      }
+
+      // 也可以显示一个简单的 alert 作为备用
+      alert(`新订单提醒!\n设备: ${data.device}\n问题: ${data.issue}\n客户: ${data.customer}`);
+    });
+
+    // 组件卸载时断开连接
+    return () => {
+      newSocket.disconnect();
+    };
   }, []);
+
+  // 当用户登录后，注册用户ID到 Socket.IO
+  useEffect(() => {
+    if (authed && socket) {
+      const user = auth.user;
+      if (user && user.id) {
+        socket.emit('register', user.id);
+      }
+    }
+  }, [authed, socket]);
 
   if (!authed) return <LoginPage onLogin={() => setAuthed(true)} />;
 

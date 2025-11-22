@@ -54,11 +54,11 @@ const request = (url, method = 'GET', data = {}, options = {}) => {
 }
 
 // 新增：单文件上传（返回服务器 URL）
-const uploadimage = (filePath) => {
+const uploadimage = (filePath, onProgress) => {
   const baseUrl = getApp().globalData.API || ''
   const token = wx.getStorageSync('token')
   return new Promise((resolve, reject) => {
-    wx.uploadFile({
+    const uploadTask = wx.uploadFile({
       url: `${baseUrl}/upload`,
       filePath,
       name: 'file',
@@ -73,6 +73,10 @@ const uploadimage = (filePath) => {
       },
       fail: reject
     })
+
+    if (onProgress && typeof onProgress === 'function') {
+      uploadTask.onProgressUpdate(res => onProgress(res.progress))
+    }
   })
 }
 

@@ -163,6 +163,15 @@
     </button>
   </view>
 </view>
+
+<!-- 上传进度条-居中悬浮 -->
+<view class="progress-overlay" wx:if="{{uploadProgress > 0}}">
+  <view class="progress-box">
+    <view class="progress-text">{{uploadProgress}}%</view>
+    <progress percent="{{uploadProgress}}" stroke-width="6" activeColor="#2563eb" backgroundColor="#e5e7eb" border-radius="3" />
+    <view class="progress-label">文件上传中，请稍候...</view>
+  </view>
+</view>
 </view>
 
 <!-- 客户端：确认完成（废弃） 

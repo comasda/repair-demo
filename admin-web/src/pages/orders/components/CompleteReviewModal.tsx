@@ -111,7 +111,7 @@ export default function CompleteReviewModal({ visible, order, onOk, onCancel }: 
           <div style={{ marginBottom: 20 }}>
             <span style={{ color: '#6b7280', fontWeight: 500 }}>当前状态：</span>
             <span style={{ fontWeight: 700, marginLeft: 8, fontSize: 15, color: '#dc2626' }}>
-              {order.status === 'awaitingConfirm' ? '⏳ 待完成审核' : order.status}
+              {order.status === 'awaitingConfirm' ? '⏳ 待审核' : order.status}
             </span>
           </div>
 

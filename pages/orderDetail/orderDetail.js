@@ -6,7 +6,7 @@ const statusMap = {
   offered: '待接收',
   assigned: '已接单',
   checkedIn: '已签到',
-  awaitingConfirm: '待完成审核',
+  awaitingConfirm: '待审核',
   done: '已完成',
   cancelled: '已取消'
 }
@@ -64,7 +64,8 @@ Page({
     })),
 
     // 视频是否处于全屏状态（用于避免拦截返回/暂停）
-    videoFullScreen: false
+    videoFullScreen: false,
+    uploadProgress: 0,
   },
 
   onLoad(options) {
@@ -307,12 +308,18 @@ Page({
       })
     })
 
-    wx.showLoading({ title: '正在上传...', mask: true })
-    const uploadTasks = localFiles.map(item => uploadimage(item.filePath))
+    this.setData({ uploadProgress: 0 })
+    const uploadTasks = localFiles.map(item =>
+      uploadimage(item.filePath, progress => {
+        // 这里简单处理：只显示最后一个文件的上传进度
+        // 如果需要合并所有文件的总进度，会复杂很多
+        this.setData({ uploadProgress: progress })
+      })
+    )
 
     Promise.all(uploadTasks)
       .then(urls => {
-        wx.hideLoading()
+        this.setData({ uploadProgress: 0 }) // 上传成功后立即隐藏进度条
 
         // 兼容旧字段：一维数组（按上传顺序）
         const checkinImages = urls
@@ -333,6 +340,7 @@ Page({
           })
         })
 
+        wx.showLoading({ title: '正在提交...', mask: true })
         return post(`/technicians/${order._id}/complete-request`, {
           technicianId: userId,
           checkinImages,
@@ -340,12 +348,14 @@ Page({
         })
       })
       .then(() => {
+        wx.hideLoading()
         wx.showToast({ title: '已发起完成，等待管理员确认' })
         try { wx.removeStorageSync(DRAFT_KEY_PREFIX + order._id) } catch (e) {}
         this.loadOrder(order._id)
       })
       .catch(err => {
         wx.hideLoading()
+        this.setData({ uploadProgress: 0 })
         wx.showToast({ title: err.message || '操作失败', icon: 'none' })
       })
   },
@@ -415,6 +425,8 @@ Page({
       count: canAdd,  // ✅ 一次最多还能选几个
       mediaType: ['image', 'video'],
       sourceType: ['album', 'camera'],
+      sizeType: ['compressed'], // 优先使用压缩图
+      compressed: true, // 视频也开启压缩
       success: (res) => {
         const files = res.tempFiles || []
         if (!files.length) return
