@@ -96,17 +96,17 @@
 <view wx:if="{{role === 'technician' && order && order.status === 'checkedIn'}}" class="checkin-section">
   <view class="section-title">到场佐证（图片或视频）</view>
 
-  <block wx:for="{{checkinSlots}}" wx:key="key">
+  <block wx:for="{{checkinSlots}}" wx:key="key" wx:for-item="slot" wx:for-index="slotIndex">
     <view class="checkin-slot">
       <view class="slot-header">
-        {{index + 1}}. {{item.label}}
+        {{slotIndex + 1}}. {{slot.label}}
       </view>
 
-      <view class="slot-tips">{{item.tips}}</view>
+      <view class="slot-tips">{{slot.tips}}</view>
 
       <!-- 已选择的文件列表（图片或视频，可多张） -->
-      <view class="slot-files" wx:if="{{item.files && item.files.length}}">
-        <block wx:for="{{item.files}}" wx:for-item="file" wx:for-index="fileIndex" wx:key="filePath">
+      <view class="slot-files" wx:if="{{slot.files && slot.files.length}}">
+        <block wx:for="{{slot.files}}" wx:for-item="file" wx:for-index="fileIndex" wx:key="filePath">
           <view class="slot-file">
             <!-- 图片预览 -->
             <image
@@ -115,13 +115,13 @@
               class="slot-media"
               mode="aspectFill"
               bindtap="previewCheckinSlot"
-              data-index="{{index}}"
+              data-index="{{slotIndex}}"
               data-file-index="{{fileIndex}}"
             />
             <!-- 视频预览 -->
             <video
               wx:elif="{{file.fileType === 'video'}}"
-              id="video_{{index}}_{{fileIndex}}"
+              id="video_{{slotIndex}}_{{fileIndex}}"
               src="{{file.filePath}}"
               class="slot-media"
               controls
@@ -133,7 +133,7 @@
             <view
               class="slot-remove-btn"
               bindtap="removeCheckinSlot"
-              data-index="{{index}}"
+              data-index="{{slotIndex}}"
               data-file-index="{{fileIndex}}"
             >
               删除
@@ -146,10 +146,10 @@
       <view
         class="slot-uploader"
         bindtap="chooseCheckinMedia"
-        data-index="{{index}}"
+        data-index="{{slotIndex}}"
       >
         <text class="slot-uploader-plus">＋</text>
-        <text class="slot-uploader-text">点击上传 {{item.label}}</text>
+        <text class="slot-uploader-text">点击上传 {{slot.label}}</text>
       </view>
     </view>
   </block>

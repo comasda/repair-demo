@@ -1,0 +1,13 @@
+{
+  "name": "repair-demo",
+  "private": true,
+  "scripts": {
+    "generate-cos-config": "node scripts/generate-cos-config.js"
+  },
+  "dependencies": {
+    "cos-wx-sdk-v5": "^1.8.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5"
+  }
+}

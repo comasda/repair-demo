@@ -25,14 +25,48 @@ Page({
   chooseImage() {
     wx.chooseImage({
       count: 3, sizeType: ['compressed'],
-      success: res => this.setData({ images: this.data.images.concat(res.tempFilePaths) })
+      success: res => {
+        // 选择图片后立即上传到云存储
+        this.uploadImagesToCloud(res.tempFilePaths);
+      }
     })
   },
 
-  // 预览图片
+  // 新增：上传图片到云存储
+  async uploadImagesToCloud(tempFilePaths) {
+    wx.showLoading({ title: '上传中...', mask: true });
+
+    try {
+      const uploadPromises = tempFilePaths.map(filePath =>
+        uploadimage(filePath, null, true) // 使用云存储上传
+      );
+
+      const results = await Promise.all(uploadPromises);
+      const cloudFileIDs = results.map(r => r.fileID);
+
+      // 更新页面数据，存储云存储的fileID
+      this.setData({
+        images: [...this.data.images, ...cloudFileIDs]
+      });
+
+      wx.showToast({ title: '上传成功', icon: 'success' });
+    } catch (error) {
+      console.error('上传失败:', error);
+      wx.showToast({ title: '上传失败', icon: 'none' });
+    } finally {
+      wx.hideLoading();
+    }
+  },
+
+  // 预览图片 - 直接使用COS URL
   previewImage(e) {
-    const current = e.currentTarget.dataset.src
-    wx.previewImage({ current, urls: this.data.images })
+    const current = e.currentTarget.dataset.src;
+    const urls = this.data.images;
+
+    wx.previewImage({
+      current: current,
+      urls: urls
+    });
   },
 
   // 删除某张
@@ -53,33 +87,22 @@ Page({
       return wx.showToast({ title: '请先评分(1-5)', icon: 'none' })
     }
 
-    wx.showLoading({ title: '上传中...', mask: true })
-
-    // 上传所有图片并获取 URL
-    let urls = []
+    // 图片已在选择时上传到云存储，直接使用fileID提交评价
     try {
-      if (images && images.length) {
-        const tasks = images.map(p => uploadimage(p))
-        urls = await Promise.all(tasks)
-      }
-      // 上传完再提交评价
       await post(`/customer/${orderId}/reviews`, {
         customerId: user.id || user._id,
         customerName: user.username || user.nickname || '',
         rating,
         content: content || '',
-        images: urls
+        images: images  // 直接使用云存储的fileID列表
       })
-      wx.hideLoading()
-    } catch (err) {
-      wx.hideLoading()
-      wx.showToast({ icon: 'none', title: err.message || '上传失败' })
-      return
-    }
 
-    wx.showToast({ title: this.data.mode === 'append' ? '追加成功' : '评价成功' })
-    this.refreshPrevPage()
-    setTimeout(() => wx.navigateBack(), 800)
+      wx.showToast({ title: this.data.mode === 'append' ? '追加成功' : '评价成功' })
+      this.refreshPrevPage()
+      setTimeout(() => wx.navigateBack(), 800)
+    } catch (err) {
+      wx.showToast({ icon: 'none', title: err.message || '提交失败' })
+    }
   },
 
   /** 🔁 通用刷新函数 **/

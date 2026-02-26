@@ -3,5 +3,8 @@
 package-lock.json
 node_modules/
 dist/
+config/cos.private.json
+config/cos.private.js
+.env
 !.gitignore
 !README.md

@@ -274,7 +274,7 @@ Page({
   },
 
   // —— 师傅端：发起完成（仅在已签到时可用）——
-  requestComplete() {
+  async requestComplete() {
     const { order, role, userId, checkinSlots } = this.data
     if (!order) return
     if (role !== 'technician') {
@@ -296,7 +296,7 @@ Page({
       wx.showToast({ title: `请先上传：${missingSlot.label}`, icon: 'none' })
       return
     }
-    // 把所有文件展开成一个一维数组上传
+    // 把所有文件展开成一个一维数组上传到云存储
     const localFiles = []
     checkinSlots.forEach(slot => {
       (slot.files || []).forEach(f => {
@@ -309,55 +309,60 @@ Page({
     })
 
     this.setData({ uploadProgress: 0 })
-    const uploadTasks = localFiles.map(item =>
-      uploadimage(item.filePath, progress => {
-        // 这里简单处理：只显示最后一个文件的上传进度
-        // 如果需要合并所有文件的总进度，会复杂很多
-        this.setData({ uploadProgress: progress })
+
+    // 上传到云存储
+    wx.showLoading({ title: '上传中...', mask: true })
+    try {
+      const uploadPromises = localFiles.map((item, index) => {
+        // 根据文件类型选择云存储路径
+        const type = item.fileType === 'video' ? 'video' : 'image'
+        return uploadimage(item.filePath, (progress) => {
+          // 更新上传进度
+          this.setData({ uploadProgress: Math.round((index + progress / 100) / localFiles.length * 100) })
+        }, true) // 使用云存储
       })
-    )
 
-    Promise.all(uploadTasks)
-      .then(urls => {
-        this.setData({ uploadProgress: 0 }) // 上传成功后立即隐藏进度条
+      const results = await Promise.all(uploadPromises)
+      const fileIDs = results.map(r => r.fileID)
 
-        // 兼容旧字段：一维数组（按上传顺序）
-        const checkinImages = urls
+      this.setData({ uploadProgress: 0 })
+      wx.hideLoading()
 
-        // 新字段：按类别整理
-        const checkinMedia = {}
-        CHECKIN_SLOTS.forEach(s => { checkinMedia[s.key] = [] })
+      // 兼容旧字段：一维数组（按上传顺序）
+      const checkinImages = fileIDs
 
-        urls.forEach((url, idx) => {
-          const info = localFiles[idx]
-          if (!info) return
-          if (!checkinMedia[info.slotKey]) {
-            checkinMedia[info.slotKey] = []
-          }
-          checkinMedia[info.slotKey].push({
-            url,
-            type: info.fileType || 'image'
-          })
+      // 新字段：按类别整理
+      const checkinMedia = {}
+      CHECKIN_SLOTS.forEach(s => { checkinMedia[s.key] = [] })
+
+      fileIDs.forEach((fileID, idx) => {
+        const info = localFiles[idx]
+        if (!info) return
+        if (!checkinMedia[info.slotKey]) {
+          checkinMedia[info.slotKey] = []
+        }
+        checkinMedia[info.slotKey].push({
+          url: fileID,  // 云存储fileID
+          type: info.fileType || 'image'
         })
+      })
 
-        wx.showLoading({ title: '正在提交...', mask: true })
-        return post(`/technicians/${order._id}/complete-request`, {
-          technicianId: userId,
-          checkinImages,
-          checkinMedia
-        })
+      wx.showLoading({ title: '正在提交...', mask: true })
+      await post(`/technicians/${order._id}/complete-request`, {
+        technicianId: userId,
+        checkinImages,
+        checkinMedia
       })
-      .then(() => {
-        wx.hideLoading()
-        wx.showToast({ title: '已发起完成，等待管理员确认' })
-        try { wx.removeStorageSync(DRAFT_KEY_PREFIX + order._id) } catch (e) {}
-        this.loadOrder(order._id)
-      })
-      .catch(err => {
-        wx.hideLoading()
-        this.setData({ uploadProgress: 0 })
-        wx.showToast({ title: err.message || '操作失败', icon: 'none' })
-      })
+
+      wx.hideLoading()
+      wx.showToast({ title: '已发起完成，等待管理员确认' })
+      try { wx.removeStorageSync(DRAFT_KEY_PREFIX + order._id) } catch (e) {}
+      this.loadOrder(order._id)
+    } catch (err) {
+      wx.hideLoading()
+      this.setData({ uploadProgress: 0 })
+      wx.showToast({ title: err.message || '操作失败', icon: 'none' })
+    }
   },
 
   // —— 客户端：取消订单（仅在 pending/offered 时显示）——
@@ -449,7 +454,7 @@ Page({
     })
   },
 
-  // ★ 预览某个分类坑位的图片或视频
+  // ★ 预览某个分类坑位的图片或视频 - 修改为支持云存储
   previewCheckinSlot(e) {
     const slotIndex = Number(e.currentTarget.dataset.index)
     const fileIndex = Number(e.currentTarget.dataset.fileIndex || 0)
@@ -465,11 +470,13 @@ Page({
       return
     }
 
+    // 直接预览图片（现在是COS URL）
+    const imageFiles = slot.files.filter(f => f.fileType !== 'video')
+    const imageUrls = imageFiles.map(f => f.filePath)
+
     wx.previewImage({
       current: file.filePath,
-      urls: slot.files
-        .filter(f => f.fileType === 'image')
-        .map(f => f.filePath)
+      urls: imageUrls
     })
   },
 
@@ -501,9 +508,13 @@ Page({
     // 如果当前已经是全屏状态，就不要再拦截点击
     if (videoFullScreen) return
 
-    const ctx = wx.createVideoContext(id, this)
-    // 只负责切换到全屏，不自动 play，避免和暂停按钮冲突
-    ctx.requestFullScreen({ direction: 0 }) // 0 竖屏，90 横屏
+    try {
+      const ctx = wx.createVideoContext(id, this)
+      // 只负责切换到全屏，不自动 play，避免和暂停按钮冲突
+      ctx.requestFullScreen({ direction: 0 }) // 0 竖屏，90 横屏
+    } catch (err) {
+      console.warn('createVideoContext 失败', id, err)
+    }
   },
 
   // ★ 监听视频全屏状态变化（进入/退出）

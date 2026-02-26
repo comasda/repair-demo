@@ -274,7 +274,8 @@ export default function MediaViewer({ visible, items = [], initialIndex = 0, onC
           overflow: 'hidden',
         }}
       >
-        {curr.type === 'video' || /\.mp4$|\.webm$|\.ogg$/i.test(curr.url || '') ? (
+        {/* 直接显示媒体内容 */}
+        {curr.type === 'video' || /\.mp4$|\.webm$|\.ogg$|\.mov$|\.avi$/i.test(curr.url || '') ? (
           <video
             key={curr.url}
             src={curr.url}
