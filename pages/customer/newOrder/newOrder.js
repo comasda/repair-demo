@@ -143,21 +143,9 @@ Page({
   },
 
   submitOrder() {
-    const { title, desc, phone, address, images, location } = this.data
-    if (!title || !desc || !phone || !address) {
-      wx.showToast({ title: '请填写完整信息', icon: 'none' }); return
-    }
-
-    // 提醒采集位置（不是强制，但推荐）
-    if (!location) {
-      wx.showModal({
-        title: '提示',
-        content: '建议选择服务位置，以便师傅到场签到与路径规划。是否继续提交？',
-        success: (r) => { if (r.confirm) this._doSubmit(); }
-      })
-    } else {
-      this._doSubmit()
-    }
+    const user = wx.getStorageSync('currentUser')
+    if (!user) { wx.showToast({ title: '请先登录', icon: 'none' }); return }
+    this._doSubmit()
   },
 
   _doSubmit() {
@@ -170,13 +158,13 @@ Page({
     post('/customer', {
       customer: user.username,
       customerId: user.id || user._id,
-      device: title,
-      issue: desc,
-      phone,
-      address,
+      device: title || '',
+      issue: desc || '',
+      phone: phone || '',
+      address: address || '',
       images: images,           // 直接使用云存储的fileID列表
-      location,                 // { lat, lng }
-      locationAddress: locationDesc
+      location: location || null,                 // { lat, lng }
+      locationAddress: locationDesc || ''
     }, { loading: true })
       .then(() => {
         wx.showToast({

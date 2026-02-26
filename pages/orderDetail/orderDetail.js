@@ -138,19 +138,13 @@ Page({
     })
   },
 
-  // —— 师傅端：到场签到（自动获取定位 & 距离判断）——
+  // —— 师傅端：到场签到（仍记录定位，但不校验距离）——
   checkin() {
     const { order } = this.data
     if (!order) return
 
-    // 订单必须有坐标
-    if (order._lat == null || order._lng == null) {
-      wx.showModal({
-        title: '无法签到',
-        content: '该工单未配置定位坐标，无法进行到场距离校验，请联系管理员或让客户下单时选择位置。',
-        showCancel: false
-      })
-      return
+    const report = (lat, lng) => {
+      this._postCheckin(order._id, lat, lng)
     }
 
     const run = () => {
@@ -158,37 +152,8 @@ Page({
         type: 'gcj02',
         isHighAccuracy: true,
         highAccuracyExpireTime: 5000,
-        success: (loc) => {
-          const lat = loc.latitude
-          const lng = loc.longitude
-          const dist = Math.round(haversineDistance(lat, lng, order._lat, order._lng))
-
-          if (dist <= CHECKIN_RADIUS_M) {
-            this._postCheckin(order._id, lat, lng)
-          } else {
-            wx.showToast({
-              title: `距工单位置约${dist}米，需在${CHECKIN_RADIUS_M}米内才能签到`,
-              icon: 'none',
-              duration: 2500
-            })
-          }
-        },
-        fail: (e) => {
-          console.error('getLocation 失败：', e)
-          let msg = '获取定位失败'
-          const em = String(e.errMsg || '')
-          if (em.includes('need to be declared')) {
-            msg = '缺少 requiredPrivateInfos 配置，请联系管理员'
-          } else if (em.includes('auth deny') || em.includes('authorize')) {
-            msg = '未授权定位，请在设置里开启定位权限'
-          }
-          wx.showModal({
-            title: '定位失败',
-            content: msg,
-            confirmText: '去设置',
-            success: (r) => { if (r.confirm) wx.openSetting({}) }
-          })
-        }
+        success: (loc) => report(loc.latitude, loc.longitude),
+        fail: () => report(null, null)
       })
     }
 
@@ -196,13 +161,13 @@ Page({
       success: (ps) => {
         const go = () => {
           wx.getSetting({
-            success: s => {
+            success: (s) => {
               if (s.authSetting['scope.userLocation']) run()
               else {
                 wx.authorize({
                   scope: 'scope.userLocation',
                   success: run,
-                  fail: () => wx.openSetting({})
+                  fail: () => run()
                 })
               }
             }
@@ -211,7 +176,7 @@ Page({
         if (ps.needAuthorization) {
           wx.requirePrivacyAuthorize({
             success: go,
-            fail: () => wx.showToast({ title: '未同意隐私协议，无法定位', icon: 'none' })
+            fail: () => run()
           })
         } else {
           go()
