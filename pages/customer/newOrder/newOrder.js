@@ -1,4 +1,5 @@
 const { post, uploadimage } = require('../../../utils/request')
+const smartFillConfig = require('./smartFillConfig')
 
 Page({
   data: {
@@ -8,13 +9,45 @@ Page({
     phone: '',
     address: '',   // 文字地址（手填或选择位置返回的 address）
     location: null,           // { lat, lng }
-    locationDesc: ''          // 展示给用户看的地址
+    locationDesc: '',         // 展示给用户看的地址
+    smartText: '',
+    smartFillSummary: [],
+    smartFillPreviewVisible: false,
+    smartFillPreviewItems: [],
+    smartFillDraft: null
   },
 
   onTitleInput(e) { this.setData({ title: e.detail.value }) },
   onDescInput(e)  { this.setData({ desc: e.detail.value }) },
   onPhoneInput(e) { this.setData({ phone: e.detail.value }) },
   onAddressInput(e){ this.setData({ address: e.detail.value }) },
+
+  onSmartTextInput(e) {
+    this.setData({ smartText: e.detail.value })
+  },
+
+  confirmSmartFill() {
+    const draft = this.data.smartFillDraft || {}
+    const previewItems = this.data.smartFillPreviewItems || []
+
+    this.setData({
+      ...draft,
+      smartFillSummary: previewItems,
+      smartFillPreviewVisible: false,
+      smartFillPreviewItems: [],
+      smartFillDraft: null
+    })
+
+    wx.showToast({ title: '已自动填充', icon: 'success' })
+  },
+
+  cancelSmartFill() {
+    this.setData({
+      smartFillPreviewVisible: false,
+      smartFillPreviewItems: [],
+      smartFillDraft: null
+    })
+  },
 
   chooseImage() {
     wx.chooseImage({
@@ -77,8 +110,7 @@ Page({
           this.setData({
             location: { lat: loc.latitude, lng: loc.longitude },
             locationDesc: loc.address || loc.name || '',
-            // 如果地址为空，用选择位置填充一下你的 address 输入
-            address: this.data.address || loc.address || ''
+            address: loc.address || loc.name || this.data.address
           })
         },
         fail: () => {
@@ -146,6 +178,175 @@ Page({
     const user = wx.getStorageSync('currentUser')
     if (!user) { wx.showToast({ title: '请先登录', icon: 'none' }); return }
     this._doSubmit()
+  },
+
+  createSmartFillState(rawText) {
+    return {
+      next: {},
+      summary: [],
+      workingText: rawText.replace(/\s+/g, ' ').trim()
+    }
+  },
+
+  escapeRegex(text) {
+    return String(text).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  },
+
+  createAlternationPattern(words) {
+    return (words || []).map(word => this.escapeRegex(word)).join('|')
+  },
+
+  buildSmartFillPatterns() {
+   const addressPrefixPattern = this.createAlternationPattern(smartFillConfig.address.prefixes)
+   const devicePrefixPattern = this.createAlternationPattern(smartFillConfig.device.prefixes)
+   const issuePrefixPattern = this.createAlternationPattern(smartFillConfig.issue.prefixes)
+   const addressKeywordPattern = this.createAlternationPattern(smartFillConfig.address.keywords)
+    const issueStopPattern = this.createAlternationPattern([
+    ...smartFillConfig.issue.prefixes,
+    ...smartFillConfig.address.stopKeywords
+    ])
+   const deviceHintPattern = this.createAlternationPattern(smartFillConfig.device.hintKeywords)
+   const issueHintPattern = this.createAlternationPattern(smartFillConfig.issue.hintKeywords)
+
+    return {
+    phoneRegex: new RegExp(smartFillConfig.phone.regex),
+      addressKeywordRegex: new RegExp(`(?:${addressPrefixPattern})[：:\\s]*([^，。、；\\n]+)`, 'i'),
+      deviceKeywordRegex: new RegExp(`(?:${devicePrefixPattern})[：:\\s]*([^，。、；\\n]+)`, 'i'),
+      issueKeywordRegex: new RegExp(`(?:${issuePrefixPattern})[：:\\s]*([^\\n]+)`, 'i'),
+      genericAddressRegex: new RegExp(`([^，。、；\\n]*?(?:${addressKeywordPattern})[^，。、；\\n]*?)(?=(?:${issueStopPattern}|$))`, 'iu'),
+      deviceHintRegex: new RegExp(deviceHintPattern, 'i'),
+      issueHintRegex: new RegExp(issueHintPattern, 'i')
+    }
+  },
+
+  addSmartFillField(state, field, label, value) {
+    if (!value || state.next[field]) return
+    const normalizedValue = value.trim()
+    if (!normalizedValue) return
+
+    state.next[field] = normalizedValue
+    state.summary.push({ field, label, value: normalizedValue })
+  },
+
+  consumeSmartFillText(state, fragment) {
+    if (!fragment) return
+    state.workingText = state.workingText
+      .replace(fragment, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+  },
+
+  trimIssueTail(text) {
+    if (!text) return ''
+    const normalized = text.replace(/\s+/g, ' ').trim()
+    const stopPattern = this.createAlternationPattern(smartFillConfig.address.stopKeywords)
+    const splitMatch = normalized.match(new RegExp(`^(.*?)(?=(?:${stopPattern}))`, 'i'))
+    return (splitMatch ? splitMatch[1] : normalized).trim()
+  },
+
+  normalizeAddress(text) {
+    if (!text) return ''
+    let normalized = this.trimIssueTail(text)
+    const addressEndPattern = this.createAlternationPattern(smartFillConfig.address.endKeywords)
+    const numberEndMatch = normalized.match(new RegExp(`^([\\s\\S]*?\\d+(?:${addressEndPattern})(?:[A-Za-z0-9一二三四五六七八九十甲乙丙丁单元室层栋座#\\-]*)?)`, 'u'))
+    if (numberEndMatch) {
+      normalized = numberEndMatch[1].trim()
+    }
+    return normalized.replace(/\s+/g, ' ').trim()
+  },
+
+  extractPhone(rawText, state, patterns) {
+    const phoneMatch = rawText.match(patterns.phoneRegex)
+    if (!phoneMatch) return
+
+    this.addSmartFillField(state, 'phone', smartFillConfig.ui.labels.phone, phoneMatch[1] || phoneMatch[0])
+    this.consumeSmartFillText(state, phoneMatch[0])
+  },
+
+  extractAddress(state, patterns) {
+    const addressKeywordMatch = state.workingText.match(patterns.addressKeywordRegex)
+    if (addressKeywordMatch) {
+      const normalizedAddress = this.normalizeAddress(addressKeywordMatch[1])
+      this.addSmartFillField(state, 'address', smartFillConfig.ui.labels.address, normalizedAddress)
+      this.consumeSmartFillText(state, addressKeywordMatch[0])
+      return
+    }
+
+    const genericAddressMatch = state.workingText.match(patterns.genericAddressRegex)
+    if (!genericAddressMatch) return
+
+    const normalizedAddress = this.normalizeAddress(genericAddressMatch[1])
+    this.addSmartFillField(state, 'address', smartFillConfig.ui.labels.address, normalizedAddress)
+    this.consumeSmartFillText(state, normalizedAddress)
+  },
+
+  extractDevice(state, patterns) {
+    const deviceKeywordMatch = state.workingText.match(patterns.deviceKeywordRegex)
+    if (deviceKeywordMatch) {
+      this.addSmartFillField(state, 'title', smartFillConfig.ui.labels.title, deviceKeywordMatch[1])
+      this.consumeSmartFillText(state, deviceKeywordMatch[0])
+      return
+    }
+
+    const segments = state.workingText
+      .split(/[，。、；;\n\r\s]+/)
+      .map(segment => segment.trim())
+      .filter(Boolean)
+
+    const deviceSegment = segments.find(segment => patterns.deviceHintRegex.test(segment) && !patterns.issueHintRegex.test(segment))
+    if (!deviceSegment) return
+
+    this.addSmartFillField(state, 'title', smartFillConfig.ui.labels.title, deviceSegment)
+    this.consumeSmartFillText(state, deviceSegment)
+  },
+
+  extractIssue(state, patterns) {
+    const issueKeywordMatch = state.workingText.match(patterns.issueKeywordRegex)
+    if (issueKeywordMatch) {
+      this.addSmartFillField(state, 'desc', smartFillConfig.ui.labels.desc, issueKeywordMatch[1])
+      this.consumeSmartFillText(state, issueKeywordMatch[0])
+    }
+
+    const remainingText = state.workingText
+      .replace(/\s+/g, ' ')
+      .trim()
+
+    if (!state.next.desc && remainingText) {
+      this.addSmartFillField(state, 'desc', smartFillConfig.ui.labels.desc, remainingText)
+    }
+  },
+
+  buildSmartFillResult(rawText) {
+    const state = this.createSmartFillState(rawText)
+    const patterns = this.buildSmartFillPatterns()
+
+    this.extractPhone(rawText, state, patterns)
+    this.extractAddress(state, patterns)
+    this.extractDevice(state, patterns)
+    this.extractIssue(state, patterns)
+
+    return state
+  },
+
+  autoFillFromText() {
+    const raw = (this.data.smartText || '').trim()
+    if (!raw) {
+      wx.showToast({ title: '请输入识别内容', icon: 'none' })
+      return
+    }
+
+    const { next, summary } = this.buildSmartFillResult(raw)
+
+    if (!summary.length) {
+      wx.showToast({ title: '未识别到有效信息，请手动填写', icon: 'none' })
+      return
+    }
+
+    this.setData({
+      smartFillPreviewVisible: true,
+      smartFillPreviewItems: summary,
+      smartFillDraft: next
+    })
   },
 
   _doSubmit() {

@@ -8,3 +8,4 @@ config/cos.private.js
 .env
 !.gitignore
 !README.md
+*.md

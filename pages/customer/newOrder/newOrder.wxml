@@ -1,46 +1,117 @@
-<view class="container">
-  <view class="title">新建工单</view>
-
-  <input class="input" placeholder="请输入工单标题" bindinput="onTitleInput" />
-
-  <textarea class="textarea" placeholder="请输入问题描述" bindinput="onDescInput"></textarea>
-
-  <view class="section">
-    <text class="label">上传图片（可选）</text>
-    <!-- 选择按钮：不足3张时可继续添加 -->
-    <button
-      class="choose-btn"
-      wx:if="{{images.length < 3}}"
-      catchtap="chooseImage"
-    >选择图片（剩{{3 - images.length}}）</button>
-
-    <!-- 缩略图网格：可预览、可删除 -->
-    <view class="img-grid">
-      <block wx:for="{{images}}" wx:key="*this">
-        <view class="img-cell">
-          <image class="thumb" src="{{item}}" mode="aspectFill"
-                 data-src="{{item}}" catchtap="previewImage" />
-          <view class="img-del" data-index="{{index}}" catchtap="removeImage">×</view>
-        </view>
-      </block>
+<view class="page">
+  <view wx:if="{{smartFillPreviewVisible}}" class="smart-fill-mask">
+    <view class="smart-fill-modal">
+      <view class="smart-fill-modal-title">识别结果预览</view>
+      <view class="smart-fill-modal-desc">请确认是否使用以下拆解结果</view>
+      <view class="smart-fill-modal-list">
+        <block wx:for="{{smartFillPreviewItems}}" wx:for-item="entry" wx:for-index="idx" wx:key="idx">
+          <view class="modal-item">
+            <text class="modal-item-label">{{entry.label}}：</text>
+            <text class="modal-item-value">{{entry.value}}</text>
+          </view>
+        </block>
+      </view>
+      <view class="smart-fill-modal-actions">
+        <button class="modal-btn modal-btn-cancel" bindtap="cancelSmartFill">取消</button>
+        <button class="modal-btn modal-btn-confirm" bindtap="confirmSmartFill">使用识别内容</button>
+      </view>
     </view>
   </view>
 
-  <input class="input" placeholder="请输入联系方式" bindinput="onPhoneInput" />
+  <view class="card">
+    <view class="title">新建工单</view>
 
-  <view class="form-item">
-    <input placeholder="请输入详细地址" bindinput="onAddressInput" value="{{address}}" />
+    <view class="smart-fill-card">
+      <view class="smart-fill-title">粘贴完整信息，一键识别</view>
+      <textarea
+        class="smart-fill-textarea"
+        placeholder="设备：家用洗衣机；问题：噪音大；电话：13800000000；地址：上海黄浦区延安东路..."
+        bindinput="onSmartTextInput"
+        value="{{smartText}}"
+      ></textarea>
+      <button class="smart-fill-btn" type="default" bindtap="autoFillFromText">自动填充</button>
+    </view>
+
+    <view class="row">
+      <text>设备</text>
+      <input
+        class="input"
+        placeholder="请输入工单标题"
+        bindinput="onTitleInput"
+        value="{{title}}"
+      />
+    </view>
+
+    <view class="row">
+      <text>问题</text>
+      <textarea
+        class="textarea"
+        placeholder="请输入问题描述"
+        bindinput="onDescInput"
+        value="{{desc}}"
+      ></textarea>
+    </view>
+
+    <view class="row images-row">
+      <text>图片</text>
+      <view class="images-column">
+        <button
+          class="choose-btn"
+          wx:if="{{images.length < 3}}"
+          catchtap="chooseImage"
+        >
+          选择图片（剩{{3 - images.length}}）
+        </button>
+        <view class="img-grid">
+          <block wx:for="{{images}}" wx:key="*this">
+            <view class="img-cell">
+              <image
+                class="thumb"
+                src="{{item}}"
+                mode="aspectFill"
+                data-src="{{item}}"
+                catchtap="previewImage"
+              />
+              <view class="img-del" data-index="{{index}}" catchtap="removeImage">×</view>
+            </view>
+          </block>
+        </view>
+      </view>
+    </view>
+
+    <view class="row">
+      <text>电话</text>
+      <input
+        class="input"
+        placeholder="请输入联系方式"
+        bindinput="onPhoneInput"
+        value="{{phone}}"
+      />
+    </view>
+
+    <view class="row">
+      <text>地址</text>
+      <input
+        class="input"
+        placeholder="请输入详细地址"
+        bindinput="onAddressInput"
+        value="{{address}}"
+      />
+    </view>
+
+    <view class="row location-row">
+      <text>定位</text>
+      <view class="location-actions">
+        <button class="location-btn" bindtap="chooseLocation">定位选址</button>
+        <button class="location-btn outlined" bindtap="getCurrentLocation">使用当前位置</button>
+      </view>
+    </view>
+
+    <view wx:if="{{location}}" class="location-hint">
+      <text>已选择位置：</text>
+      <text>{{locationAddress || '已获取坐标'}}（{{location.lat}}, {{location.lng}}）</text>
+    </view>
   </view>
 
-  <view class="form-item row">
-    <button type="primary" size="mini" bindtap="chooseLocation">选择位置</button>
-    <button type="default" size="mini" bindtap="getCurrentLocation" style="margin-left: 16rpx;">使用当前位置</button>
-  </view>
-
-  <view wx:if="{{location}}" class="location-hint">
-    <text>已选择位置：</text>
-    <text>{{locationAddress || '已获取坐标'}}（{{location.lat}}, {{location.lng}}）</text>
-  </view>
-
-  <button class="btn-primary" bindtap="submitOrder">提交工单</button>
+  <button class="btn-primary submit-btn" bindtap="submitOrder">提交工单</button>
 </view>
