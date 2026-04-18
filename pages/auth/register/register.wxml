@@ -1,61 +1,41 @@
 <view class="page">
   <view class="card">
-  <!-- 身份选择 -->
+  <view class="section-title">首次登录完善资料</view>
+
   <view class="row">
-    <text>注册身份</text>
+    <text>使用身份</text>
     <picker mode="selector" range="{{roles}}" value="{{roleIndex}}" bindchange="onRoleChange">
       <view class="picker">{{ roleText }}</view>
     </picker>
   </view>
 
-  <!-- 手机号 -->
   <view class="row">
-    <text>手机号</text>
-    <input type="number" maxlength="11" placeholder="请输入手机号" value="{{phone}}" bindinput="onPhoneInput" />
+    <text>昵称</text>
+    <input
+      type="nickname"
+      placeholder="请输入昵称"
+      value="{{displayName}}"
+      bindinput="onNameInput"
+      maxlength="20"
+    />
   </view>
 
-  <!-- 验证码 + 获取按钮 -->
-  <view class="row">
-    <text>验证码</text>
-    <input type="number" maxlength="6" placeholder="请输入验证码" value="{{code}}" bindinput="onCodeInput" />
-    <button
-      size="mini"
-      class="btn-code {{countdown>0 || sending ? 'disabled' : ''}}"
-      bindtap="sendCaptcha"
-      disabled="{{countdown>0 || sending}}"
-    >
-      {{ countdown>0 ? countdown + 's' : '获取验证码' }}
-    </button>
+  <view class="tips">
+    <view>1. 请选择当前登录身份：客户或师傅；</view>
+    <view>2. 填写昵称：确认使用微信昵称或输入昵称；</view>
+    <view>3. 点击下方按钮授权微信手机号；</view>
+    <view>4. 完成后将立即创建账号并进入系统。</view>
   </view>
 
-  <!-- ✅ 固定验证码提示 -->
-  <view wx:if="{{useFixedOtp}}" class="otp-hint">
-    测试环境验证码：<text class="otp-code">123456</text>
-  </view>
-
-  <!-- 密码 & 确认密码 -->
-  <view class="row">
-    <text>密码</text>
-    <input password placeholder="至少6位" value="{{password}}" bindinput="onPwdInput" />
-  </view>
-  <view class="row">
-    <text>确认密码</text>
-    <input password placeholder="请再次输入密码" value="{{confirmPwd}}" bindinput="onConfirmPwdInput" />
-  </view>
-
-  <!-- 师傅必填：身份证姓名 & 身份证号 -->
-
-  <view class="row">
-    <text>姓名</text>
-    <input placeholder="请输入姓名" value="{{idName}}" bindinput="onIdNameInput" />
-  </view>
-  <view class="row">
-    <text>身份证号</text>
-    <input placeholder="请输入身份证号码" value="{{idNumber}}" bindinput="onIdNumberInput" />
-  </view>
-
-
-      <button type="primary" bindtap="registerUser">注册</button>
+      <button
+        class="submit-btn"
+        type="primary"
+        open-type="getPhoneNumber"
+        bindgetphonenumber="handleGetPhoneNumber"
+        loading="{{submitting}}"
+      >
+        {{submitting ? '提交中...' : '授权手机号并进入系统'}}
+      </button>
     </view>
   <view class="safe-bottom" />
 </view>

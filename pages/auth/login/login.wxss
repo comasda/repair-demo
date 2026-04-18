@@ -25,6 +25,14 @@
   color: #111827;
 }
 
+.desc {
+  margin: 28rpx 0 56rpx;
+  font-size: 28rpx;
+  line-height: 1.7;
+  color: #6b7280;
+  text-align: center;
+}
+
 .input-box {
   position: relative;            /* 供右侧图标定位 */
   border: 1px solid #D9D9D9;     /* 边框色 */
@@ -107,6 +115,7 @@ button {
   margin-top: 80rpx;
   font-size: 28rpx;
   color: #6b7280;
+  text-align: center;
 }
 .link {
   color: #2563eb;

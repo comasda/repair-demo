@@ -1,52 +1,12 @@
 <view class="container">
+  <view class="title">微信快捷登录</view>
+  <view class="desc">首次登录将自动进入身份选择和手机号绑定，完成后即可直接使用。</view>
 
-  <view class="title">登录</view>
-
-  <view wx:if="{{mode==='password'}}" class="form-box">
-  <!-- 手机号输入（加外框） -->
-  <view class="input-box">
-    <input
-      type="number"
-      placeholder="请输入手机号"
-      class="login-input"
-      bindinput="onPhoneInput"
-      maxlength="11"
-    />
-  </view>
-
-  <!-- 密码输入（加外框 + 小眼睛切换：与 input 同级横向布局，真机无层级问题） -->
-  <view class="input-box has-icon">
-    <input
-      type="text"
-      password="{{!passwordVisible}}"
-      placeholder="请输入密码"
-      class="login-input"
-      bindinput="onPwdInput"
-    />
-    <!-- 不再覆盖在原生 input 上，而是放在右侧 -->
-    <view
-      class="eye-btn {{passwordVisible ? 'open' : 'closed'}}"
-      catchtap="togglePasswordVisible"
-      aria-label="切换密码可见性"
-    ></view>
-  </view>
-    <button class="btn-primary" bindtap="loginWithPassword">密码登录</button>
-  </view>
-
-  <view wx:if="{{mode==='code'}}" class="form-box">
-    <input type="text" placeholder="请输入手机号" maxlength="11" bindinput="onPhoneInput" class="input"/>
-    <verify-code 
-      phone="{{phone}}" 
-      bind:codeinput="onCodeInput"
-      bind:codesent="onCodeSent"
-    />
-    <button class="btn-primary" bindtap="loginWithCode">验证码登录</button>
-  </view>
+  <button class="btn-wechat" loading="{{loggingIn}}" bindtap="handleWechatLogin">
+    {{loggingIn ? '登录中...' : '使用微信一键登录'}}
+  </button>
 
   <view class="footer">
-    <text class="link" bindtap="switchMode">
-      {{mode==='password' ? '用验证码登录' : '用密码登录'}}
-    </text>
-    <text class="link" bindtap="goRegister">去注册</text>
+    <text>登录即代表同意使用微信身份完成账号创建与登录。</text>
   </view>
 </view>

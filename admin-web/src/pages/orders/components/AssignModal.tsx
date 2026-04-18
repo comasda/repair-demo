@@ -94,7 +94,7 @@ export default function AssignModal({ visible, onOk, onCancel }: Props) {
                 <option value="">请选择技师</option>
                   {filtered.map(t => (
                     <option key={t._id} value={t._id}>
-                      {t.name ? `${t.name}（${t.phone}）` : t.phone}
+                      {!t.name || t.name === t.phone ? t.phone : `${t.name}（${t.phone}）`}
                     </option>
                   ))}
               </select>

@@ -80,11 +80,26 @@
 /* 提交按钮 */
 button[type="primary"] {
   margin-top: 28rpx;
-  height: 88rpx;
-  line-height: 88rpx;
   font-size: 30rpx;
   border-radius: 16rpx;
   background: #111827;
+}
+
+.submit-btn {
+  width: 100%;
+  min-height: 88rpx;
+  height: 88rpx;
+  padding: 0 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.4;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.submit-btn::after {
+  border: none;
 }
 
 /* 轻量提示/分组标题（可选） */
@@ -110,4 +125,29 @@ button[type="primary"] {
 .otp-code {
   color: #111827;
   font-weight: 600;
+}
+
+.readonly-value {
+  color: #6b7280;
+}
+
+.multiline-value {
+  min-height: 72rpx;
+  height: auto;
+  line-height: 1.6;
+  padding-top: 16rpx;
+  padding-bottom: 16rpx;
+  white-space: normal;
+  word-break: break-all;
+  box-sizing: border-box;
+}
+
+.tips {
+  margin-top: 24rpx;
+  padding: 20rpx 24rpx;
+  background: #f7f8fa;
+  border-radius: 12rpx;
+  color: #4b5563;
+  font-size: 26rpx;
+  line-height: 1.8;
 }
