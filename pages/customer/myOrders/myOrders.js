@@ -2,7 +2,6 @@ const { get, post } = require('../../../utils/request')
 
 const statusMap = {
   pending: '待接单',
-  offered: '待接单',
   assigned: '已接单',
   checkedIn: '已接单',
   awaitingConfirm: '待确认',
@@ -44,7 +43,7 @@ Page({
   // 通用拉取函数：根据当前 tab 携带 status 请求
  async fetchOrders() {
     const user = wx.getStorageSync('currentUser')
-    if (!user || user.role !== 'customer') {
+    if (!user || user.role !== 'customer' || user.isGuest) {
       wx.showToast({ title: '请用客户账号登录', icon: 'none' })
       wx.reLaunch({ url: '/pages/auth/login/login' })
       return

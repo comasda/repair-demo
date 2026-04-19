@@ -7,8 +7,9 @@ Page({
 
   onShow() {
     const user = wx.getStorageSync('currentUser')
-    if (!user || user.role !== 'technician') {
+    if (!user || user.role !== 'technician' || user.isGuest) {
       wx.showToast({ title: '请用师傅账号登录', icon: 'none' })
+      wx.reLaunch({ url: '/pages/auth/login/login' })
       return
     }
     const technicianId = user.id || user._id

@@ -1,12 +1,46 @@
-<view class="container">
-  <view class="title">微信快捷登录</view>
-  <view class="desc">首次登录将自动进入身份选择和手机号绑定，完成后即可直接使用。</view>
+<view class="page">
+  <view class="hero">
+    <view class="hero-badge">便捷报修 · 支持先体验后登录</view>
+    <view class="title">欢迎使用安逸修</view>
+    <view class="desc">你可以先以访客身份体验客户端或师傅端流程，也可以直接使用微信登录。涉及提交工单、接单、查看个人订单等身份型操作时，再完成注册登录即可。</view>
+  </view>
 
-  <button class="btn-wechat" loading="{{loggingIn}}" bindtap="handleWechatLogin">
-    {{loggingIn ? '登录中...' : '使用微信一键登录'}}
-  </button>
+  <view class="panel">
+    <view class="section-head">
+      <view>
+        <view class="section-title">访客体验</view>
+        <view class="section-subtitle">先浏览流程，后完成注册</view>
+      </view>
+    </view>
+
+    <view class="field-label">请选择体验身份</view>
+    <picker mode="selector" range="{{roles}}" value="{{roleIndex}}" bindchange="onGuestRoleChange">
+      <view class="guest-picker">
+        <text>{{roles[roleIndex]}}</text>
+        <text class="picker-arrow">⌵</text>
+      </view>
+    </picker>
+
+    <button class="btn btn-guest" bindtap="handleGuestLogin">以当前身份进入体验</button>
+
+    <view class="divider">
+      <view class="divider-line"></view>
+      <text class="divider-text">或直接登录</text>
+      <view class="divider-line"></view>
+    </view>
+
+    <button class="btn btn-wechat" loading="{{loggingIn}}" bindtap="handleWechatLogin">
+      {{loggingIn ? '登录中...' : '使用微信一键登录'}}
+    </button>
+
+    <view class="feature-list">
+      <view class="feature-item">提交工单</view>
+      <view class="feature-item">查看订单</view>
+      <view class="feature-item">接单记录</view>
+    </view>
+  </view>
 
   <view class="footer">
-    <text>登录即代表同意使用微信身份完成账号创建与登录。</text>
+    <text>微信登录后可保存个人身份信息，并继续使用完整报修与接单能力。</text>
   </view>
 </view>

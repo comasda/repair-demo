@@ -175,8 +175,7 @@ Page({
   },
 
   submitOrder() {
-    const user = wx.getStorageSync('currentUser')
-    if (!user) { wx.showToast({ title: '请先登录', icon: 'none' }); return }
+    if (!getApp().requireRealUser('提交工单')) return
     this._doSubmit()
   },
 

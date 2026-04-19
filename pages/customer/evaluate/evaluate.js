@@ -10,7 +10,7 @@ Page({
 
   onShow() {
     const user = wx.getStorageSync('currentUser')
-    if (!user || user.role !== 'customer') {
+    if (!user || user.role !== 'customer' || user.isGuest) {
       wx.showToast({ title: '请用客户账号登录', icon: 'none' })
       wx.reLaunch({ url: '/pages/auth/login/login' })
       return

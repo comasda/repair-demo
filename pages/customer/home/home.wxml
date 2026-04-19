@@ -1,4 +1,8 @@
 <view class="container">
+  <view wx:if="{{isGuest}}" class="guest-banner">
+    <text class="guest-banner-title">当前为访客体验</text>
+    <text class="guest-banner-desc">可先浏览首页与填写报修信息；提交工单、查看个人订单等操作时，将引导你注册/登录。</text>
+  </view>
 
   <!-- 顶部统计卡片 -->
   <view class="stats-card">

@@ -70,7 +70,7 @@ Page({
 
   onLoad(options) {
     const user = wx.getStorageSync('currentUser')
-    if (!user) {
+    if (!user || user.isGuest) {
       wx.showToast({ title: '请先登录', icon: 'none' })
       wx.reLaunch({ url: '/pages/auth/login/login' })
       return

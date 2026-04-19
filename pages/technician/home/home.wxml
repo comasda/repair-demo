@@ -1,5 +1,10 @@
 <view class="container">
 
+  <view wx:if="{{isGuest}}" class="guest-banner">
+    <text class="guest-banner-title">当前为师傅访客体验</text>
+    <text class="guest-banner-desc">可先浏览师傅端页面与流程；接单、查看个人工单等操作时，将引导你注册/登录。</text>
+  </view>
+
   <!-- 顶部统计卡片 -->
   <view class="stats-card">
     <view class="stat-item">

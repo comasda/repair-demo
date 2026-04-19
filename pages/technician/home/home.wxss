@@ -5,6 +5,29 @@
   box-sizing: border-box;
 }
 
+.guest-banner {
+  margin-bottom: 24rpx;
+  padding: 24rpx;
+  border-radius: 18rpx;
+  background: #ecfeff;
+  border: 1rpx solid #a5f3fc;
+}
+
+.guest-banner-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #155e75;
+}
+
+.guest-banner-desc {
+  display: block;
+  margin-top: 10rpx;
+  color: #0f766e;
+  font-size: 24rpx;
+  line-height: 1.6;
+}
+
 /* 顶部统计卡片 */
 .stats-card {
   display: flex;

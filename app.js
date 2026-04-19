@@ -88,6 +88,31 @@ App({
     API: 'https://www.lihewasher.com/api',
     cosConfig
   },
+  getCurrentUser: function() {
+    return wx.getStorageSync('currentUser') || null
+  },
+  isGuestUser: function(user) {
+    const currentUser = user || this.getCurrentUser()
+    return !!(currentUser && currentUser.isGuest)
+  },
+  goAuthPage: function() {
+    wx.navigateTo({ url: '/pages/auth/login/login' })
+  },
+  requireRealUser: function(actionText = '继续操作') {
+    const user = this.getCurrentUser()
+    if (!user || user.isGuest) {
+      wx.showModal({
+        title: '请先注册/登录',
+        content: `当前为访客体验，${actionText}前请先微信登录或注册。`,
+        confirmText: '去注册',
+        success: (res) => {
+          if (res.confirm) this.goAuthPage()
+        }
+      })
+      return false
+    }
+    return true
+  },
   checkLogin: function() {
     const user = wx.getStorageSync('currentUser')
     if (!user) {
