@@ -1,6 +1,7 @@
 Page({
   data: {
     isGuest: false,
+    currentUser: null,
     stats: {
       pending: 0,
       balance: 0,
@@ -11,9 +12,16 @@ Page({
   onShow() {
     const app = getApp()
     const user = wx.getStorageSync('currentUser')
-    const isGuest = app.isGuestUser(user)
+
+    if (user && !user.isGuest && user.role === 'technician') {
+      wx.reLaunch({ url: '/pages/technician/home/home' })
+      return
+    }
+
+    const isGuest = !user || app.isGuestUser(user)
 
     this.setData({
+      currentUser: user || null,
       isGuest,
       stats: {
         pending: isGuest ? 1 : 2,
@@ -25,6 +33,24 @@ Page({
 
   ensureRegistered(actionText) {
     return getApp().requireRealUser(actionText)
+  },
+
+  goAuthEntry() {
+    wx.navigateTo({ url: '/pages/auth/login/login' })
+  },
+
+  goTechnicianExperience() {
+    const technicianGuest = {
+      id: 'guest-technician',
+      username: '访客师傅',
+      role: 'technician',
+      isGuest: true,
+      registerSource: 'guest'
+    }
+
+    wx.removeStorageSync('token')
+    wx.setStorageSync('currentUser', technicianGuest)
+    wx.reLaunch({ url: '/pages/technician/home/home' })
   },
 
   goNewOrder() {

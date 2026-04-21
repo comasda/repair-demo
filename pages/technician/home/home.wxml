@@ -1,8 +1,15 @@
 <view class="container">
+  <view wx:if="{{isGuest}}" class="guest-hero">
+    <view class="guest-badge">师傅版访客界面</view>
+    <text class="guest-hero-title">欢迎先体验接单流程</text>
+    <text class="guest-hero-desc">现在可直接浏览师傅端首页与接单流程。接单、查看个人工单、收益资料等需要身份的操作时，再完成微信登录/注册即可。</text>
 
-  <view wx:if="{{isGuest}}" class="guest-banner">
-    <text class="guest-banner-title">当前为师傅访客体验</text>
-    <text class="guest-banner-desc">可先浏览师傅端页面与流程；接单、查看个人工单等操作时，将引导你注册/登录。</text>
+    <view class="guest-action-row">
+      <button class="guest-btn primary" bindtap="goTasks">立即体验接单</button>
+      <button class="guest-btn secondary" bindtap="goAuthEntry">微信登录 / 注册</button>
+    </view>
+
+    <view class="guest-switch" bindtap="goCustomerExperience">切换到客户体验</view>
   </view>
 
   <!-- 顶部统计卡片 -->
@@ -23,37 +30,37 @@
 
 <view class="menu-wrapper card">
   <!-- 功能入口 -->
-  <view class="grid-card">
+  <view class="grid">
     <view class="grid-item" bindtap="goTasks">
-      <view class="icon-box bg-blue"><image src="/assets/icons/order_list.png" class="icon"/></view>
+      <image class="icon" mode="aspectFit" src="/assets/icons/order_list.png"></image>
       <text class="label">工单列表</text>
     </view>
     <view class="grid-item" bindtap="gomyOrders">
-      <view class="icon-box bg-green"><image src="/assets/icons/my_orders.png" class="icon"/></view>
+      <image class="icon" mode="aspectFit" src="/assets/icons/my_orders.png"></image>
       <text class="label">我的工单</text>
     </view>
     <view class="grid-item" bindtap="goIncome">
-      <view class="icon-box bg-orange"><image src="/assets/icons/income_log.png" class="icon"/></view>
+      <image class="icon" mode="aspectFit" src="/assets/icons/income_log.png"></image>
       <text class="label">收益记录</text>
     </view>
     <view class="grid-item" bindtap="goProfile">
-      <view class="icon-box bg-gray"><image src="/assets/icons/my_profile.png" class="icon"/></view>
+      <image class="icon" mode="aspectFit" src="/assets/icons/my_profile.png"></image>
       <text class="label">我的资料</text>
     </view>
     <view class="grid-item" bindtap="goEvaluate">
-      <view class="icon-box bg-purple"><image src="/assets/icons/evaluate.png" class="icon"/></view>
+      <image class="icon" mode="aspectFit" src="/assets/icons/evaluate.png"></image>
       <text class="label">工单评价</text>
     </view>
     <view class="grid-item" bindtap="goComplaint">
-      <view class="icon-box bg-red"><image src="/assets/icons/complaint_handle.png" class="icon"/></view>
+      <image class="icon" mode="aspectFit" src="/assets/icons/complaint_handle.png"></image>
       <text class="label">投诉处理</text>
     </view>
     <view class="grid-item" bindtap="goBills">
-      <view class="icon-box bg-sky"><image src="/assets/icons/bill_detail.png" class="icon"/></view>
+      <image class="icon" mode="aspectFit" src="/assets/icons/bill_detail.png"></image>
       <text class="label">账务明细</text>
     </view>
     <view class="grid-item" bindtap="goAbout">
-      <view class="icon-box bg-pink"><image src="/assets/icons/about_us.png" class="icon"/></view>
+      <image class="icon" mode="aspectFit" src="/assets/icons/about_us.png"></image>
       <text class="label">关于我们</text>
     </view>
   </view>

@@ -1,6 +1,7 @@
 Page({
   data: {
     isGuest: false,
+    currentUser: null,
     stats: {
       pending: 3,
       completed: 12,
@@ -11,9 +12,16 @@ Page({
   onShow() {
     const app = getApp()
     const user = wx.getStorageSync('currentUser')
-    const isGuest = app.isGuestUser(user)
+
+    if (user && !user.isGuest && user.role === 'customer') {
+      wx.reLaunch({ url: '/pages/customer/home/home' })
+      return
+    }
+
+    const isGuest = !user || app.isGuestUser(user)
 
     this.setData({
+      currentUser: user || null,
       isGuest,
       stats: isGuest
         ? { pending: 2, completed: 3, income: 0 }
@@ -23,6 +31,16 @@ Page({
 
   ensureRegistered(actionText) {
     return getApp().requireRealUser(actionText)
+  },
+
+  goAuthEntry() {
+    wx.navigateTo({ url: '/pages/auth/login/login' })
+  },
+
+  goCustomerExperience() {
+    wx.removeStorageSync('token')
+    wx.removeStorageSync('currentUser')
+    wx.reLaunch({ url: '/pages/customer/home/home' })
   },
 
   goTasks() {

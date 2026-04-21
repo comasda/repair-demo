@@ -1,7 +1,15 @@
 <view class="container">
-  <view wx:if="{{isGuest}}" class="guest-banner">
-    <text class="guest-banner-title">当前为访客体验</text>
-    <text class="guest-banner-desc">可先浏览首页与填写报修信息；提交工单、查看个人订单等操作时，将引导你注册/登录。</text>
+  <view wx:if="{{isGuest}}" class="guest-hero">
+    <view class="guest-badge">客户版访客界面</view>
+    <text class="guest-hero-title">欢迎先体验报修流程</text>
+    <text class="guest-hero-desc">现在可直接浏览客户首页、填写报修信息。提交工单、查看个人订单、账户信息等需要身份的操作时，再完成微信登录/注册即可。</text>
+
+    <view class="guest-action-row">
+      <button class="guest-btn primary" bindtap="goNewOrder">立即体验报修</button>
+      <button class="guest-btn secondary" bindtap="goAuthEntry">微信登录 / 注册</button>
+    </view>
+
+    <view class="guest-switch" bindtap="goTechnicianExperience">切换到师傅体验</view>
   </view>
 
   <!-- 顶部统计卡片 -->
