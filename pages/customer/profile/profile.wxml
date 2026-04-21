@@ -1,0 +1,38 @@
+<view class="container">
+  <view class="hero">
+    <view class="hero-badge">客户账户</view>
+    <text class="hero-title">我的账户</text>
+    <text class="hero-desc">查看你的基础资料、注册方式与当前账号状态。</text>
+  </view>
+
+  <view class="summary-card" wx:if="{{profile}}">
+    <text class="summary-name">{{profile.displayName}}</text>
+    <text class="summary-phone">{{profile.phone}}</text>
+    <view class="summary-tags">
+      <text class="summary-tag">{{profile.roleText}}</text>
+      <text class="summary-tag status">{{profile.reviewStatus}}</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">基础资料</view>
+    <view class="info-list">
+      <view class="info-item" wx:for="{{basicItems}}" wx:key="label">
+        <text class="info-label">{{item.label}}</text>
+        <text class="info-value">{{item.value}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">状态信息</view>
+    <view class="info-list">
+      <view class="info-item" wx:for="{{statusItems}}" wx:key="label">
+        <text class="info-label">{{item.label}}</text>
+        <text class="info-value">{{item.value}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="page-tip">资料加载中...</view>
+</view>

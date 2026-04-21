@@ -57,7 +57,7 @@ Page({
   },
   goProfile() {
     if (!this.ensureRegistered('查看我的资料')) return
-    wx.showToast({ title: '跳转我的资料', icon: 'none' })
+    wx.navigateTo({ url: '/pages/technician/profile/profile' })
   },
 
   goEvaluate() {

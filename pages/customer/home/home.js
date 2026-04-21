@@ -71,7 +71,7 @@ Page({
   },
   goProfile() {
     if (!this.ensureRegistered('查看我的账户')) return
-    wx.showToast({ title: '跳转我的账户', icon: 'none' })
+    wx.navigateTo({ url: '/pages/customer/profile/profile' })
   },
   goComplaint() {
     wx.showToast({ title: '跳转投诉建议', icon: 'none' })

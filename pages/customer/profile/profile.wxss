@@ -1,0 +1,127 @@
+.container {
+  min-height: 100vh;
+  padding: 30rpx;
+  box-sizing: border-box;
+  background: #f3f4f6;
+}
+
+.hero {
+  padding: 30rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  box-shadow: 0 12rpx 30rpx rgba(79, 70, 229, 0.18);
+}
+
+.hero-badge {
+  display: inline-block;
+  padding: 10rpx 18rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.18);
+  color: #e0e7ff;
+  font-size: 22rpx;
+  line-height: 1;
+}
+
+.hero-title {
+  display: block;
+  margin-top: 20rpx;
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.hero-desc {
+  display: block;
+  margin-top: 14rpx;
+  font-size: 25rpx;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.summary-card,
+.card {
+  margin-top: 24rpx;
+  padding: 28rpx;
+  background: #ffffff;
+  border-radius: 20rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.06);
+}
+
+.summary-name {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #111827;
+}
+
+.summary-phone {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  color: #6b7280;
+}
+
+.summary-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx;
+  margin-top: 22rpx;
+}
+
+.summary-tag {
+  padding: 10rpx 18rpx;
+  border-radius: 999rpx;
+  background: #eef2ff;
+  color: #4f46e5;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.summary-tag.status {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.card-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #111827;
+}
+
+.info-list {
+  margin-top: 16rpx;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24rpx;
+  padding: 22rpx 0;
+  border-bottom: 1rpx solid #f1f5f9;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  color: #6b7280;
+  font-size: 26rpx;
+}
+
+.info-value {
+  flex: 1;
+  text-align: right;
+  color: #111827;
+  font-size: 27rpx;
+  line-height: 1.6;
+  word-break: break-all;
+}
+
+.page-tip {
+  margin-top: 24rpx;
+  text-align: center;
+  color: #6b7280;
+  font-size: 24rpx;
+}

@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/customer/home/home",
+    "pages/customer/profile/profile",
     "pages/auth/login/login",
     "pages/auth/phoneLogin/phoneLogin",
     "pages/auth/register/register",
@@ -8,6 +9,7 @@
     "pages/customer/newOrder/newOrder",
     "pages/customer/myOrders/myOrders",
     "pages/technician/home/home",
+    "pages/technician/profile/profile",
     "pages/dashboard/dashboard",
     "pages/technician/pendingOrders/pendingOrders",
     "pages/technician/myOrders/myOrders",
